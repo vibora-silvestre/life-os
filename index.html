@@ -510,16 +510,17 @@
     </div>
   </div>
 
-  <!-- MODAL: ADICIONAR REGISTRO FINANCEIRO -->
+  <!-- MODAL: ADICIONAR / EDITAR REGISTRO FINANCEIRO -->
   <div id="financeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-bold text-base text-slate-800">Novo Registro Financeiro</h3>
+        <h3 id="financeModalTitle" class="font-bold text-base text-slate-800">Novo Registro Financeiro</h3>
         <button onclick="closeFinanceModal()" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
+      <input type="hidden" id="editFinanceId">
       <div class="space-y-4 text-xs">
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Título / Identificação</label>
@@ -656,7 +657,6 @@
 
     // FUNÇÃO DE REFRESH MANUAL PARA O ANALYTICS
     function refreshAnalytics() {
-      // Recarrega o estado do localStorage caso tenha havido alterações externas
       const saved = localStorage.getItem('life_os_data');
       if (saved) {
         appState = JSON.parse(saved);
@@ -1183,9 +1183,14 @@
             </div>
             <div class="flex items-center gap-3">
               <span class="font-extrabold text-slate-800">R$ ${val.toFixed(2)}</span>
-              <button onclick="deleteFinance(${f.id})" class="text-slate-300 hover:text-rose-500 transition">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
+              <div class="flex items-center gap-1">
+                <button onclick="showEditFinanceModal(${f.id})" class="p-1 text-slate-400 hover:text-sky-600 transition" title="Editar lançamento">
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+                <button onclick="deleteFinance(${f.id})" class="p-1 text-slate-300 hover:text-rose-500 transition" title="Excluir lançamento">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
             </div>
           </div>
           ${f.notes ? `<p class="text-[11px] text-slate-500 bg-white/70 p-2 rounded-lg border border-slate-100 italic">💬 ${f.notes}</p>` : ''}
@@ -1208,7 +1213,28 @@
     }
 
     function showAddFinanceModal() {
+      document.getElementById('editFinanceId').value = '';
+      document.getElementById('financeModalTitle').textContent = 'Novo Registro Financeiro';
+      document.getElementById('finTitle').value = '';
+      document.getElementById('finAmount').value = '';
+      document.getElementById('finType').value = 'income';
       document.getElementById('finMonthVal').value = selectedMonth;
+      document.getElementById('finNotes').value = '';
+      document.getElementById('financeModal').classList.remove('hidden');
+    }
+
+    function showEditFinanceModal(id) {
+      const entry = appState.finances.find(f => f.id === id);
+      if (!entry) return;
+
+      document.getElementById('editFinanceId').value = entry.id;
+      document.getElementById('financeModalTitle').textContent = 'Editar Registro Financeiro';
+      document.getElementById('finTitle').value = entry.title;
+      document.getElementById('finAmount').value = entry.amount;
+      document.getElementById('finType').value = entry.type;
+      document.getElementById('finMonthVal').value = entry.month || selectedMonth;
+      document.getElementById('finNotes').value = entry.notes || '';
+      
       document.getElementById('financeModal').classList.remove('hidden');
     }
 
@@ -1217,6 +1243,7 @@
     }
 
     function saveFinanceEntry() {
+      const editId = document.getElementById('editFinanceId').value;
       const title = document.getElementById('finTitle').value;
       const amount = document.getElementById('finAmount').value;
       const type = document.getElementById('finType').value;
@@ -1225,24 +1252,31 @@
 
       if (!title || !amount) return;
 
-      appState.finances.push({
-        id: Date.now(),
-        title,
-        amount: parseFloat(amount),
-        type,
-        month,
-        notes: notes ? notes.trim() : ''
-      });
+      if (editId) {
+        const entry = appState.finances.find(f => f.id === parseInt(editId, 10));
+        if (entry) {
+          entry.title = title;
+          entry.amount = parseFloat(amount);
+          entry.type = type;
+          entry.month = month;
+          entry.notes = notes ? notes.trim() : '';
+        }
+      } else {
+        appState.finances.push({
+          id: Date.now(),
+          title,
+          amount: parseFloat(amount),
+          type,
+          month,
+          notes: notes ? notes.trim() : ''
+        });
+      }
 
       if (month) {
         selectedMonth = month;
       }
 
       closeFinanceModal();
-      document.getElementById('finTitle').value = '';
-      document.getElementById('finAmount').value = '';
-      document.getElementById('finNotes').value = '';
-      
       saveData();
     }
 
