@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Life OS - Dashboard Pessoal</title>
+
+  <!-- PWA & Mobile Optimization Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Life OS">
+  <meta name="theme-color" content="#FAF8F5">
+
+  <!-- Tailwind CSS & Lucide Icons & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            pastel: {
+              cream: '#FFFDF9',
+              bg: '#FAF8F5',
+              border: '#F1ECE6',
+              rose: '#FCE7F3',
+              roseDark: '#9D174D',
+              sage: '#DCFCE7',
+              sageDark: '#166534',
+              lavender: '#F3E8FF',
+              lavenderDark: '#6B21A8',
+              sky: '#E0F2FE',
+              skyDark: '#075985',
+              peach: '#FFEDD5',
+              peachDark: '#9A3412',
+              cardBg: '#FFFFFF',
+              textPrimary: '#2D3748',
+              textSecondary: '#718096'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { 
+      background-color: #FAF8F5; 
+      color: #2D3748; 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pastel-card { background: #FFFFFF; border: 1px solid #F1ECE6; box-shadow: 0 4px 20px -2px rgba(220, 200, 190, 0.12); }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .tab-btn.active {
+      background-color: #FFFFFF;
+      color: #1E293B;
+      box-shadow: 0 2px 8px -1px rgba(0,0,0,0.08);
+      font-weight: 700;
+    }
+    /* Touch optimization */
+    button, input, select {
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 custom-scrollbar">
+
+  <!-- TOP BAR & HEADER -->
+  <header class="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-800 flex items-center gap-3">
+        <span class="p-2 bg-pink-100 rounded-2xl text-pink-500 inline-flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </span>
+        Life OS
+      </h1>
+      <p class="text-slate-500 text-xs md:text-sm mt-1">Seu centro pessoal de produtividade, hábitos, finanças e foco.</p>
+    </div>
+
+    <!-- CONTROLES SUPERIORES -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm">
+        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+        <span class="text-xs font-semibold text-slate-500">Mês:</span>
+        <select id="monthSelector" onchange="changeMonth(this.value)" class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
+          <!-- Populated dynamically by JS -->
+        </select>
+      </div>
+
+      <button onclick="exportData()" class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 transition shadow-sm">
+        <i data-lucide="download" class="w-4 h-4 text-indigo-500"></i> Exportar
+      </button>
+
+      <label class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 cursor-pointer transition shadow-sm">
+        <i data-lucide="upload" class="w-4 h-4 text-emerald-500"></i> Importar
+        <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+      </label>
+    </div>
+  </header>
+
+  <!-- BANNER FIXO / FLUTUANTE DE POMODORO TIMER -->
+  <section id="pomodoroBanner" class="max-w-7xl mx-auto mb-6 hidden">
+    <div class="bg-gradient-to-r from-rose-50 via-orange-50 to-pink-50 border border-rose-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xl shadow-inner">
+          🍅
+        </div>
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-500" id="pomoModeLabel">Sessão de Foco Ativa</span>
+          <h3 class="text-base font-bold text-slate-800" id="pomoTaskTitle">Selecione uma tarefa para focar</h3>
+          <p class="text-xs text-slate-500" id="pomoProjectTitle">Projeto associado</p>
+        </div>
+      </div>
+
+      <!-- TEMPORIZADOR E AÇÕES -->
+      <div class="flex items-center gap-6">
+        <div class="text-3xl md:text-4xl font-black text-slate-800 tracking-wider font-mono" id="pomoTimerDisplay">
+          25:00
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="pomoStartBtn" onclick="togglePomodoroTimer()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-xs shadow-md transition flex items-center gap-1.5">
+            <i data-lucide="play" class="w-4 h-4"></i> <span id="pomoStartBtnText">Iniciar</span>
+          </button>
+          <button onclick="resetPomodoroTimer()" class="p-2 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-xl text-xs transition" title="Resetar Timer">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+          <button onclick="closePomodoroBanner()" class="p-2 text-slate-400 hover:text-slate-600 text-xs" title="Fechar Pomodoro">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NAVEGAÇÃO POR PILARES (ABAS) -->
+  <div class="max-w-7xl mx-auto mb-8 bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1 overflow-x-auto custom-scrollbar">
+    <button onclick="switchTab('habits')" id="tabBtn-habits" class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Hábitos
+    </button>
+    <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Projetos & Tarefas
+    </button>
+    <button onclick="switchTab('finances')" id="tabBtn-finances" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Finanças
+    </button>
+    <button onclick="switchTab('analytics')" id="tabBtn-analytics" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i> Desempenho & Analytics
+    </button>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL (TELA DE CADA PILAR) -->
+  <main class="max-w-7xl mx-auto">
+
+    <!-- PILAR 1: HÁBITOS -->
+    <section id="pillar-habits" class="pillar-content space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
+              <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Rastreamento de Hábitos</h2>
+              <p class="text-xs text-slate-500">Acompanhe seus hábitos diários organizados por semanas</p>
+            </div>
+          </div>
+
+          <!-- NAVEGAÇÃO DE SEMANA -->
+          <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+            <button onclick="changeWeek(-1)" class="p-1 text-slate-600 hover:bg-white hover:shadow-sm rounded-lg transition" title="Semana Anterior">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span class="text-xs font-semibold text-slate-700 px-2" id="currentWeekLabel">Semana Atual</span>
+            <button onclick="changeWeek(1)" class="p-1 text-slate-600 hover:bg-white hover:shadow-sm rounded-lg transition" title="Próxima Semana">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- TABELA DE HÁBITOS -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400">
+                <th class="py-3 px-2 min-w-[180px]">HÁBITO</th>
+                <th id="dayHeadersContainer" class="contents">
+                  <!-- Generated by JS -->
+                </th>
+                <th class="py-3 px-2 text-right">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="habitsTableBody" class="divide-y divide-slate-50 text-sm">
+              <!-- Habit Rows rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ADICIONAR HÁBITO -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+          <input type="text" id="newHabitInput" placeholder="Criar novo hábito (ex: Meditar 10min)..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-300">
+          <button onclick="addHabit()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Hábito
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 2: PROJETOS & TAREFAS -->
+    <section id="pillar-projects" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-indigo-100 rounded-xl text-indigo-700">
+              <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Projetos & Tarefas</h2>
+              <p class="text-xs text-slate-500">Organize metas, prazos e execute sessões de Pomodoro</p>
+            </div>
+          </div>
+
+          <!-- BADGES DE STATUS DE PRAZO -->
+          <div class="flex items-center gap-2 text-xs font-medium">
+            <span class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span id="dueSoonCount">0</span> para hoje
+            </span>
+            <span class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> <span id="overdueCount">0</span> em atraso
+            </span>
+          </div>
+        </div>
+
+        <!-- CONTAINER DE PROJETOS -->
+        <div id="projectsContainer" class="space-y-6">
+          <!-- Projects rendered dynamically via JS -->
+        </div>
+
+        <!-- CRIAR PROJETO -->
+        <div class="mt-8 pt-4 border-t border-slate-100 flex items-center gap-2">
+          <input type="text" id="newProjectInput" placeholder="Nome do novo projeto..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <button onclick="addProject()" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="folder-plus" class="w-4 h-4"></i> Criar Projeto
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 3: FINANÇAS -->
+    <section id="pillar-finances" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-sky-100 rounded-xl text-sky-700">
+              <i data-lucide="wallet" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Finanças Mensais</h2>
+              <p class="text-xs text-slate-500" id="financeMonthLabel">Filtro Ativo</p>
+            </div>
+          </div>
+
+          <button onclick="showAddFinanceModal()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Lançamento
+          </button>
+        </div>
+
+        <!-- CARDS DE RESUMO FINANCEIRO -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-4">
+            <span class="text-xs font-semibold text-emerald-700 block mb-1">Entradas / A Receber</span>
+            <span id="finIncomeTotal" class="text-xl font-extrabold text-emerald-900">R$ 0,00</span>
+          </div>
+          <div class="bg-rose-50/70 border border-rose-100 rounded-2xl p-4">
+            <span class="text-xs font-semibold text-rose-700 block mb-1">Saídas / A Pagar</span>
+            <span id="finExpenseTotal" class="text-xl font-extrabold text-rose-900">R$ 0,00</span>
+          </div>
+          <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-4">
+            <span class="text-xs font-semibold text-purple-700 block mb-1">Cartão de Crédito</span>
+            <span id="finCardTotal" class="text-xl font-extrabold text-purple-900">R$ 0,00</span>
+          </div>
+          <div class="bg-sky-50/70 border border-sky-100 rounded-2xl p-4">
+            <span class="text-xs font-semibold text-sky-700 block mb-1">Saldo Estimado</span>
+            <span id="finBalanceTotal" class="text-xl font-extrabold text-sky-900">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- LISTA DE REGISTROS FINANCEIROS -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Lançamentos do Mês Selecionado</h3>
+          <div id="financeList" class="space-y-2 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Items via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 4: DESEMPENHO & ANALYTICS -->
+    <section id="pillar-analytics" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2.5 bg-purple-100 rounded-xl text-purple-700">
+            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics</h2>
+            <p class="text-xs text-slate-500">Métricas gerais de consistência e finanças</p>
+          </div>
+        </div>
+
+        <!-- INDICADORES CHAVE -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-xs">
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Taxa Conclusão Hábitos:</span>
+            <span id="habitSuccessRate" class="text-2xl font-extrabold text-emerald-600">0%</span>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Tarefas Concluídas / Atrasadas:</span>
+            <span id="taskStatusRatio" class="text-xl font-extrabold text-slate-800">0 / 0</span>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Total Ciclos Pomodoro:</span>
+            <span id="totalPomodorosCount" class="text-2xl font-extrabold text-rose-500">🍅 0</span>
+          </div>
+        </div>
+
+        <!-- DYNAMIC GRÁFICO BARRAS -->
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Ganhos vs Saídas (Mês Atual)</h3>
+          <div class="h-64">
+            <canvas id="financeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: ADICIONAR REGISTRO FINANCEIRO -->
+  <div id="financeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-base text-slate-800">Novo Registro Financeiro</h3>
+        <button onclick="closeFinanceModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Descrição</label>
+          <input type="text" id="finTitle" placeholder="Ex: Salário, Projeto Freelance, Mercado..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="finAmount" placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Categoria</label>
+            <select id="finType" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+              <option value="income">A Receber / Entrada</option>
+              <option value="expense">A Pagar / Saída</option>
+              <option value="card">Cartão de Crédito</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Mês de Referência</label>
+          <input type="month" id="finMonthVal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeFinanceModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
+        <button onclick="saveFinanceEntry()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Registro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LIFE OS CORE -->
+  <script>
+    // ESTADO E STORAGE
+    const DEFAULT_DATA = {
+      habits: [
+        { id: 1, name: 'Beber 2L de Água', logs: {} },
+        { id: 2, name: 'Ler / Estudar 30 min', logs: {} },
+        { id: 3, name: 'Atividade Física', logs: {} }
+      ],
+      projects: [
+        {
+          id: 1,
+          name: '🎯 Organização Pessoal',
+          tasks: [
+            { id: 101, name: 'Planejar metas do próximo mês', dueDate: '2026-10-25', done: false, pomodoros: 2 },
+            { id: 102, name: 'Organizar caixa de entrada', dueDate: '2026-10-18', done: true, pomodoros: 1 }
+          ]
+        }
+      ],
+      finances: [
+        { id: 1, title: 'Salário / Prolabore', amount: 5000, type: 'income', month: '2026-10' },
+        { id: 2, title: 'Aluguel & Contas', amount: 1600, type: 'expense', month: '2026-10' },
+        { id: 3, title: 'Fatura Cartão de Crédito', amount: 950, type: 'card', month: '2026-10' }
+      ]
+    };
+
+    let appState = JSON.parse(localStorage.getItem('life_os_data')) || DEFAULT_DATA;
+    let selectedMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    let currentWeekOffset = 0; // 0 = Atual, -1 = Anterior, 1 = Próxima
+    let activeTab = 'habits';
+
+    // ESTADO POMODORO
+    let pomodoroState = {
+      active: false,
+      timer: null,
+      timeLeft: 25 * 60,
+      pId: null,
+      tId: null
+    };
+
+    let financeChartInstance = null;
+
+    // INICIALIZAÇÃO
+    window.addEventListener('DOMContentLoaded', () => {
+      setupMonthSelector();
+      renderAll();
+    });
+
+    // --- TROCA DE ABAS / PILARES ---
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.pillar-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetPillar = document.getElementById(`pillar-${tabId}`);
+      const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+
+      if (targetPillar) targetPillar.classList.remove('hidden');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (tabId === 'analytics') {
+        renderAnalytics();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('life_os_data', JSON.stringify(appState));
+      renderAll();
+    }
+
+    function renderAll() {
+      lucide.createIcons();
+      renderHabits();
+      renderProjects();
+      renderFinances();
+      renderAnalytics();
+    }
+
+    // --- MÊS DE REFERÊNCIA ---
+    function setupMonthSelector() {
+      const select = document.getElementById('monthSelector');
+      select.innerHTML = '';
+      const today = new Date();
+      for (let i = -6; i <= 6; i++) {
+        const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const val = d.toISOString().slice(0, 7);
+        const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+        if (val === selectedMonth) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    function changeMonth(m) {
+      selectedMonth = m;
+      renderAll();
+    }
+
+    // --- RASTREAMENTO DE HÁBITOS ---
+    function getWeekDates(offset = 0) {
+      const curr = new Date();
+      const dayOfWeek = curr.getDay();
+      const distanceToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek) + (offset * 7);
+      
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(curr.getDate() + distanceToMon + i);
+        dates.push(d.toISOString().slice(0, 10));
+      }
+      return dates;
+    }
+
+    function changeWeek(direction) {
+      currentWeekOffset += direction;
+      renderHabits();
+    }
+
+    function renderHabits() {
+      const dates = getWeekDates(currentWeekOffset);
+      const daysShort = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+      
+      const startDateStr = new Date(dates[0] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const endDateStr = new Date(dates[6] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      document.getElementById('currentWeekLabel').textContent = `${startDateStr} a ${endDateStr}`;
+
+      const container = document.getElementById('dayHeadersContainer');
+      container.innerHTML = '';
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      dates.forEach((d, idx) => {
+        const dateObj = new Date(d + 'T00:00:00');
+        const isToday = d === todayStr;
+        const th = document.createElement('th');
+        th.className = 'py-3 px-1 text-center min-w-[52px]';
+        th.innerHTML = `
+          <div class="text-[10px] uppercase font-bold ${isToday ? 'text-emerald-600' : 'text-slate-400'}">${daysShort[idx]}</div>
+          <div class="text-xs font-bold mt-0.5 ${isToday ? 'bg-emerald-100 text-emerald-800 rounded-full w-7 h-7 flex items-center justify-center mx-auto' : 'text-slate-700'}">${dateObj.getDate()}</div>
+        `;
+        container.appendChild(th);
+      });
+
+      const tbody = document.getElementById('habitsTableBody');
+      tbody.innerHTML = '';
+
+      appState.habits.forEach(habit => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/60 transition';
+
+        let daysHtml = dates.map(d => {
+          const checked = habit.logs && habit.logs[d];
+          return `
+            <td class="py-3 px-1 text-center">
+              <button onclick="toggleHabitLog(${habit.id}, '${d}')" class="w-8 h-8 rounded-xl flex items-center justify-center mx-auto transition active:scale-95 ${checked ? 'bg-emerald-400 text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-transparent'}">
+                <i data-lucide="check" class="w-4 h-4"></i>
+              </button>
+            </td>
+          `;
+        }).join('');
+
+        tr.innerHTML = `
+          <td class="py-3 px-2 font-medium text-slate-700">${habit.name}</td>
+          ${daysHtml}
+          <td class="py-3 px-2 text-right">
+            <button onclick="deleteHabit(${habit.id})" class="p-2 text-slate-300 hover:text-rose-500 transition" title="Excluir hábito">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function toggleHabitLog(id, dateStr) {
+      const habit = appState.habits.find(h => h.id === id);
+      if (habit) {
+        if (!habit.logs) habit.logs = {};
+        habit.logs[dateStr] = !habit.logs[dateStr];
+        saveData();
+      }
+    }
+
+    function addHabit() {
+      const input = document.getElementById('newHabitInput');
+      if (!input.value.trim()) return;
+      appState.habits.push({ id: Date.now(), name: input.value.trim(), logs: {} });
+      input.value = '';
+      saveData();
+    }
+
+    function deleteHabit(id) {
+      appState.habits = appState.habits.filter(h => h.id !== id);
+      saveData();
+    }
+
+    // --- PROJETOS & POMODORO ---
+    function renderProjects() {
+      const container = document.getElementById('projectsContainer');
+      container.innerHTML = '';
+
+      let dueSoonTotal = 0;
+      let overdueTotal = 0;
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      appState.projects.forEach(project => {
+        const projEl = document.createElement('div');
+        projEl.className = 'bg-slate-50/70 border border-slate-100 rounded-2xl p-4 space-y-3';
+
+        let tasksHtml = project.tasks.map(t => {
+          const isOverdue = t.dueDate && t.dueDate < todayStr && !t.done;
+          const isDueSoon = t.dueDate && t.dueDate === todayStr && !t.done;
+
+          if (isOverdue) overdueTotal++;
+          if (isDueSoon) dueSoonTotal++;
+
+          return `
+            <div class="flex items-center justify-between gap-2 p-3 bg-white border border-slate-100 rounded-xl hover:shadow-sm transition">
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${project.id}, ${t.id})" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-400 cursor-pointer">
+                <span class="text-xs font-medium ${t.done ? 'line-through text-slate-400' : 'text-slate-700'} truncate">${t.name}</span>
+                
+                ${t.pomodoros ? `<span class="text-[10px] font-bold px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md inline-flex items-center gap-1">🍅 x${t.pomodoros}</span>` : ''}
+              </div>
+
+              <div class="flex items-center gap-2">
+                ${t.dueDate ? `
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md ${isOverdue ? 'bg-rose-100 text-rose-700' : isDueSoon ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}">
+                    ${new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                ` : ''}
+
+                <!-- BOTÃO POMODORO NA TAREFA -->
+                <button onclick="startPomodoroForTask(${project.id}, ${t.id}, '${t.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${project.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="p-1 text-slate-400 hover:text-rose-500 transition" title="Iniciar Pomodoro nesta tarefa">
+                  <i data-lucide="timer" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="deleteTask(${project.id}, ${t.id})" class="p-1 text-slate-300 hover:text-rose-500 transition" title="Excluir tarefa">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        projEl.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700">${project.name}</h3>
+            <button onclick="deleteProject(${project.id})" class="text-xs text-slate-300 hover:text-rose-500 transition">Excluir Projeto</button>
+          </div>
+
+          <div class="space-y-2">
+            ${tasksHtml || '<p class="text-xs text-slate-400 italic">Nenhuma tarefa criada neste projeto.</p>'}
+          </div>
+
+          <!-- NOVA TAREFA -->
+          <div class="flex items-center gap-2 pt-2">
+            <input type="text" id="newTaskInput-${project.id}" placeholder="Nova tarefa..." class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
+            <input type="date" id="newTaskDate-${project.id}" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none">
+            <button onclick="addTask(${project.id})" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition">Add</button>
+          </div>
+        `;
+
+        container.appendChild(projEl);
+      });
+
+      document.getElementById('dueSoonCount').textContent = dueSoonTotal;
+      document.getElementById('overdueCount').textContent = overdueTotal;
+      lucide.createIcons();
+    }
+
+    function addProject() {
+      const input = document.getElementById('newProjectInput');
+      if (!input.value.trim()) return;
+      appState.projects.push({ id: Date.now(), name: input.value.trim(), tasks: [] });
+      input.value = '';
+      saveData();
+    }
+
+    function deleteProject(pId) {
+      appState.projects = appState.projects.filter(p => p.id !== pId);
+      saveData();
+    }
+
+    function addTask(pId) {
+      const titleInput = document.getElementById(`newTaskInput-${pId}`);
+      const dateInput = document.getElementById(`newTaskDate-${pId}`);
+      if (!titleInput.value.trim()) return;
+
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        project.tasks.push({
+          id: Date.now(),
+          name: titleInput.value.trim(),
+          dueDate: dateInput.value || null,
+          done: false,
+          pomodoros: 0
+        });
+        saveData();
+      }
+    }
+
+    function toggleTaskDone(pId, tId) {
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        const task = project.tasks.find(t => t.id === tId);
+        if (task) {
+          task.done = !task.done;
+          saveData();
+        }
+      }
+    }
+
+    function deleteTask(pId, tId) {
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        project.tasks = project.tasks.filter(t => t.id !== tId);
+        saveData();
+      }
+    }
+
+    // --- LÓGICA DO POMODORO ---
+    function startPomodoroForTask(pId, tId, taskName, projName) {
+      pomodoroState.pId = pId;
+      pomodoroState.tId = tId;
+      document.getElementById('pomoTaskTitle').textContent = taskName;
+      document.getElementById('pomoProjectTitle').textContent = projName;
+      document.getElementById('pomodoroBanner').classList.remove('hidden');
+      resetPomodoroTimer();
+    }
+
+    function togglePomodoroTimer() {
+      const btnText = document.getElementById('pomoStartBtnText');
+      const startBtn = document.getElementById('pomoStartBtn');
+
+      if (pomodoroState.active) {
+        clearInterval(pomodoroState.timer);
+        pomodoroState.active = false;
+        btnText.textContent = 'Iniciar';
+        startBtn.classList.replace('bg-amber-500', 'bg-rose-500');
+      } else {
+        pomodoroState.active = true;
+        btnText.textContent = 'Pausar';
+        startBtn.classList.replace('bg-rose-500', 'bg-amber-500');
+        pomodoroState.timer = setInterval(updatePomodoroDisplay, 1000);
+      }
+      lucide.createIcons();
+    }
+
+    function resetPomodoroTimer() {
+      clearInterval(pomodoroState.timer);
+      pomodoroState.active = false;
+      pomodoroState.timeLeft = 25 * 60;
+      updateTimerUI();
+      document.getElementById('pomoStartBtnText').textContent = 'Iniciar';
+      document.getElementById('pomoStartBtn').classList.replace('bg-amber-500', 'bg-rose-500');
+      lucide.createIcons();
+    }
+
+    function updatePomodoroDisplay() {
+      if (pomodoroState.timeLeft > 0) {
+        pomodoroState.timeLeft--;
+        updateTimerUI();
+      } else {
+        clearInterval(pomodoroState.timer);
+        pomodoroState.active = false;
+
+        // Increment Pomodoro session for active task
+        if (pomodoroState.pId && pomodoroState.tId) {
+          const project = appState.projects.find(p => p.id === pomodoroState.pId);
+          if (project) {
+            const task = project.tasks.find(t => t.id === pomodoroState.tId);
+            if (task) {
+              task.pomodoros = (task.pomodoros || 0) + 1;
+              saveData();
+            }
+          }
+        }
+
+        resetPomodoroTimer();
+        alert('🎉 Sessão de 25 minutos concluída! Faça uma pausa curta de 5 minutos.');
+      }
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(pomodoroState.timeLeft / 60);
+      const secs = pomodoroState.timeLeft % 60;
+      document.getElementById('pomoTimerDisplay').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function closePomodoroBanner() {
+      clearInterval(pomodoroState.timer);
+      pomodoroState.active = false;
+      document.getElementById('pomodoroBanner').classList.add('hidden');
+    }
+
+    // --- FINANÇAS DO MÊS ---
+    function renderFinances() {
+      document.getElementById('financeMonthLabel').textContent = `Mês selecionado: ${selectedMonth}`;
+      const filtered = appState.finances.filter(f => f.month === selectedMonth);
+
+      let income = 0, expense = 0, card = 0;
+      const listContainer = document.getElementById('financeList');
+      listContainer.innerHTML = '';
+
+      filtered.forEach(f => {
+        if (f.type === 'income') income += Number(f.amount);
+        if (f.type === 'expense') expense += Number(f.amount);
+        if (f.type === 'card') card += Number(f.amount);
+
+        const typeColor = f.type === 'income' ? 'text-emerald-600 bg-emerald-50' : f.type === 'expense' ? 'text-rose-600 bg-rose-50' : 'text-purple-600 bg-purple-50';
+        const typeSign = f.type === 'income' ? '+' : '-';
+
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-xl text-xs border border-slate-100';
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg ${typeColor} flex items-center justify-center font-bold text-xs">${typeSign}</span>
+            <span class="font-medium text-slate-700">${f.title}</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="font-bold text-slate-800">R$ ${Number(f.amount).toFixed(2)}</span>
+            <button onclick="deleteFinance(${f.id})" class="text-slate-300 hover:text-rose-500 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">Nenhum lançamento no mês selecionado.</p>`;
+      }
+
+      document.getElementById('finIncomeTotal').textContent = `R$ ${income.toFixed(2)}`;
+      document.getElementById('finExpenseTotal').textContent = `R$ ${expense.toFixed(2)}`;
+      document.getElementById('finCardTotal').textContent = `R$ ${card.toFixed(2)}`;
+      document.getElementById('finBalanceTotal').textContent = `R$ ${(income - expense - card).toFixed(2)}`;
+
+      lucide.createIcons();
+    }
+
+    function showAddFinanceModal() {
+      document.getElementById('finMonthVal').value = selectedMonth;
+      document.getElementById('financeModal').classList.remove('hidden');
+    }
+
+    function closeFinanceModal() {
+      document.getElementById('financeModal').classList.add('hidden');
+    }
+
+    function saveFinanceEntry() {
+      const title = document.getElementById('finTitle').value;
+      const amount = document.getElementById('finAmount').value;
+      const type = document.getElementById('finType').value;
+      const month = document.getElementById('finMonthVal').value;
+
+      if (!title || !amount) return;
+
+      appState.finances.push({
+        id: Date.now(),
+        title,
+        amount: parseFloat(amount),
+        type,
+        month
+      });
+
+      closeFinanceModal();
+      document.getElementById('finTitle').value = '';
+      document.getElementById('finAmount').value = '';
+      saveData();
+    }
+
+    function deleteFinance(id) {
+      appState.finances = appState.finances.filter(f => f.id !== id);
+      saveData();
+    }
+
+    // --- ANALYTICS DE DESEMPENHO ---
+    function renderAnalytics() {
+      let totalLogs = 0;
+      let completedLogs = 0;
+      appState.habits.forEach(h => {
+        if (h.logs) {
+          Object.values(h.logs).forEach(v => {
+            totalLogs++;
+            if (v) completedLogs++;
+          });
+        }
+      });
+      const habitRate = totalLogs > 0 ? Math.round((completedLogs / totalLogs) * 100) : 0;
+      document.getElementById('habitSuccessRate').textContent = `${habitRate}%`;
+
+      let completedTasks = 0;
+      let overdueTasks = 0;
+      let totalPomodoros = 0;
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      appState.projects.forEach(p => {
+        p.tasks.forEach(t => {
+          if (t.done) completedTasks++;
+          if (t.dueDate && t.dueDate < todayStr && !t.done) overdueTasks++;
+          totalPomodoros += (t.pomodoros || 0);
+        });
+      });
+
+      document.getElementById('taskStatusRatio').textContent = `${completedTasks} concluidas / ${overdueTasks} atrasadas`;
+      document.getElementById('totalPomodorosCount').textContent = `🍅 ${totalPomodoros} ciclos`;
+
+      renderFinanceChart();
+    }
+
+    function renderFinanceChart() {
+      const canvas = document.getElementById('financeChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const filtered = appState.finances.filter(f => f.month === selectedMonth);
+
+      let income = 0, expensesAndCard = 0;
+      filtered.forEach(f => {
+        if (f.type === 'income') income += Number(f.amount);
+        else expensesAndCard += Number(f.amount);
+      });
+
+      if (financeChartInstance) financeChartInstance.destroy();
+
+      financeChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Ganhos', 'Saídas + Cartão'],
+          datasets: [{
+            data: [income, expensesAndCard],
+            backgroundColor: ['#A7F3D0', '#FECDD3'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { display: false } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    // --- IMPORT / EXPORT JSON ---
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `life-os-backup-${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appState = JSON.parse(e.target.result);
+          saveData();
+          alert('Dados do Life OS importados com sucesso!');
+        } catch (err) {
+          alert('Formato de arquivo inválido.');
+        }
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
