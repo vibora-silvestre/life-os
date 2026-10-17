@@ -385,14 +385,21 @@
     <!-- PILAR 4: DESEMPENHO & ANALYTICS -->
     <section id="pillar-analytics" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="p-2.5 bg-purple-100 rounded-xl text-purple-700">
-            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-purple-100 rounded-xl text-purple-700">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics</h2>
+              <p class="text-xs text-slate-500">Acompanhamento e estatísticas de consistência e finanças</p>
+            </div>
           </div>
-          <div>
-            <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics</h2>
-            <p class="text-xs text-slate-500">Acompanhamento e estatísticas de consistência e finanças</p>
-          </div>
+
+          <!-- BOTÃO DE REFRESH / ACTUALIZAÇÃO -->
+          <button onclick="refreshAnalytics()" class="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar Dados
+          </button>
         </div>
 
         <!-- CARDS DE RESUMO GERAL -->
@@ -645,6 +652,17 @@
       renderProjects();
       renderFinances();
       renderAnalytics();
+    }
+
+    // FUNÇÃO DE REFRESH MANUAL PARA O ANALYTICS
+    function refreshAnalytics() {
+      // Recarrega o estado do localStorage caso tenha havido alterações externas
+      const saved = localStorage.getItem('life_os_data');
+      if (saved) {
+        appState = JSON.parse(saved);
+      }
+      renderAnalytics();
+      lucide.createIcons();
     }
 
     function setupMonthSelector() {
@@ -1089,7 +1107,7 @@
       pomodoroState.timeLeft = 25 * 60;
       updateTimerUI();
       document.getElementById('pomoStartBtnText').textContent = 'Iniciar';
-      document.getElementById('pomoStartBtn').classList.replace('bg-amber-500', 'bg-rose-500');
+      document.getElementById('pomoStartBtn').classList.replace('bg-rose-500', 'bg-amber-500');
       lucide.createIcons();
     }
 
@@ -1216,7 +1234,6 @@
         notes: notes ? notes.trim() : ''
       });
 
-      // Atualiza o mês ativo para o mês selecionado no formulário
       if (month) {
         selectedMonth = month;
       }
