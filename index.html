@@ -77,7 +77,7 @@
         </span>
         Life OS
       </h1>
-      <p class="text-slate-500 text-xs md:text-sm mt-1">Seu centro pessoal de produtividade, hábitos, finanças e foco[cite: 2].</p>
+      <p class="text-slate-500 text-xs md:text-sm mt-1">Seu centro pessoal de produtividade, hábitos, finanças e foco.</p>
     </div>
 
     <!-- CONTROLES SUPERIORES -->
@@ -91,11 +91,11 @@
       </div>
 
       <button onclick="exportData()" class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 transition shadow-sm">
-        <i data-lucide="download" class="w-4 h-4 text-indigo-500"></i> Exportar[cite: 2]
+        <i data-lucide="download" class="w-4 h-4 text-indigo-500"></i> Exportar
       </button>
 
       <label class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 cursor-pointer transition shadow-sm">
-        <i data-lucide="upload" class="w-4 h-4 text-emerald-500"></i> Importar[cite: 2]
+        <i data-lucide="upload" class="w-4 h-4 text-emerald-500"></i> Importar
         <input type="file" accept=".json" onchange="importData(event)" class="hidden">
       </label>
     </div>
@@ -110,8 +110,8 @@
         </div>
         <div>
           <span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-500" id="pomoModeLabel">Sessão de Foco Ativa</span>
-          <h3 class="text-base font-bold text-slate-800" id="pomoTaskTitle">Selecione uma tarefa para focar[cite: 2]</h3>
-          <p class="text-xs text-slate-500" id="pomoProjectTitle">Projeto associado[cite: 2]</p>
+          <h3 class="text-base font-bold text-slate-800" id="pomoTaskTitle">Selecione uma tarefa para focar</h3>
+          <p class="text-xs text-slate-500" id="pomoProjectTitle">Projeto associado</p>
         </div>
       </div>
 
@@ -143,16 +143,16 @@
       <i data-lucide="target" class="w-4 h-4 text-amber-500"></i> Metas Anuais
     </button>
     <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
-      <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Projetos & Tarefas[cite: 2]
+      <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Projetos & Tarefas
     </button>
     <button onclick="switchTab('finances')" id="tabBtn-finances" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
-      <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Finanças[cite: 2]
+      <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Finanças
     </button>
     <button onclick="switchTab('calendar')" id="tabBtn-calendar" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
-      <i data-lucide="calendar-days" class="w-4 h-4 text-rose-500"></i> Calendário[cite: 2]
+      <i data-lucide="calendar-days" class="w-4 h-4 text-rose-500"></i> Calendário
     </button>
     <button onclick="switchTab('analytics')" id="tabBtn-analytics" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
-      <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i> Desempenho & Analytics[cite: 2]
+      <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i> Desempenho & Analytics
     </button>
   </div>
 
@@ -235,7 +235,7 @@
             </div>
             <div>
               <h2 class="font-bold text-xl text-slate-800">Metas Anuais</h2>
-              <p class="text-xs text-slate-500">Defina e acompanhe suas grandes conquistas e metas do ano[cite: 2]</p>
+              <p class="text-xs text-slate-500">Defina e acompanhe suas grandes conquistas e metas do ano</p>
             </div>
           </div>
 
@@ -251,7 +251,7 @@
         <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="space-y-1 text-center md:text-left">
             <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-700">Progresso Geral das Metas</span>
-            <h3 id="goalsSummaryTitle" class="text-lg font-bold text-slate-800">0 de 0 metas concluídas[cite: 2]</h3>
+            <h3 id="goalsSummaryTitle" class="text-lg font-bold text-slate-800">0 de 0 metas concluídas</h3>
             <p class="text-xs text-slate-500">Mantenha a consistência para alcançar seus objetivos anuais.</p>
           </div>
 
@@ -280,12 +280,12 @@
           <select id="newGoalCategory" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-700 focus:outline-none w-full md:w-auto">
             <option value="Pessoal">Pessoal</option>
             <option value="Carreira">Carreira</option>
-            <option value="Finanças">Finanças[cite: 2]</option>
+            <option value="Finanças">Finanças</option>
             <option value="Saúde">Saúde</option>
-            <option value="Estudos">Estudos[cite: 2]</option>
+            <option value="Estudos">Estudos</option>
           </select>
           <button onclick="addGoal()" class="w-full md:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap">
-            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Meta[cite: 2]
+            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Meta
           </button>
         </div>
       </div>
@@ -300,17 +300,17 @@
               <i data-lucide="folder-kanban" class="w-5 h-5"></i>
             </div>
             <div>
-              <h2 class="font-bold text-xl text-slate-800">Projetos & Tarefas[cite: 2]</h2>
-              <p class="text-xs text-slate-500">Acompanhamento do progresso de entregas e tarefas[cite: 2]</p>
+              <h2 class="font-bold text-xl text-slate-800">Projetos & Tarefas</h2>
+              <p class="text-xs text-slate-500">Acompanhamento do progresso de entregas e tarefas</p>
             </div>
           </div>
 
           <div class="flex items-center gap-2 text-xs font-medium">
             <span class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl flex items-center gap-1.5">
-              <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span id="dueSoonCount">0</span> para hoje[cite: 2]
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span id="dueSoonCount">0</span> para hoje
             </span>
             <span class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl flex items-center gap-1.5">
-              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> <span id="overdueCount">0</span> em atraso[cite: 2]
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> <span id="overdueCount">0</span> em atraso
             </span>
           </div>
         </div>
@@ -322,7 +322,7 @@
         <div class="mt-8 pt-4 border-t border-slate-100 flex items-center gap-2">
           <input type="text" id="newProjectInput" placeholder="Nome do novo projeto..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300">
           <button onclick="addProject()" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="folder-plus" class="w-4 h-4"></i> Criar Projeto[cite: 2]
+            <i data-lucide="folder-plus" class="w-4 h-4"></i> Criar Projeto
           </button>
         </div>
       </div>
@@ -337,47 +337,47 @@
               <i data-lucide="wallet" class="w-5 h-5"></i>
             </div>
             <div>
-              <h2 class="font-bold text-xl text-slate-800">Finanças Mensais[cite: 2]</h2>
-              <p class="text-xs text-slate-500" id="financeMonthLabel">Filtro Ativo[cite: 2]</p>
+              <h2 class="font-bold text-xl text-slate-800">Finanças Mensais</h2>
+              <p class="text-xs text-slate-500" id="financeMonthLabel">Filtro Ativo</p>
             </div>
           </div>
 
           <button onclick="showAddFinanceModal()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Lançamento[cite: 2]
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Lançamento
           </button>
         </div>
 
         <!-- CARDS DE RESUMO FINANCEIRO -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-8">
           <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-emerald-700 block mb-1">Entradas[cite: 2]</span>
-            <span id="finIncomeTotal" class="text-lg font-extrabold text-emerald-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-emerald-700 block mb-1">Entradas</span>
+            <span id="finIncomeTotal" class="text-lg font-extrabold text-emerald-900">R$ 0,00</span>
           </div>
           <div class="bg-rose-50/70 border border-rose-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-rose-700 block mb-1">Saídas / A Pagar[cite: 2]</span>
-            <span id="finExpenseTotal" class="text-lg font-extrabold text-rose-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-rose-700 block mb-1">Saídas / A Pagar</span>
+            <span id="finExpenseTotal" class="text-lg font-extrabold text-rose-900">R$ 0,00</span>
           </div>
           <div class="bg-amber-50/70 border border-amber-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-amber-700 block mb-1">PIX / Dinheiro[cite: 2]</span>
-            <span id="finPixTotal" class="text-lg font-extrabold text-amber-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-amber-700 block mb-1">PIX / Dinheiro</span>
+            <span id="finPixTotal" class="text-lg font-extrabold text-amber-900">R$ 0,00</span>
           </div>
           <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-purple-700 block mb-1">Cartão Crédito[cite: 2]</span>
-            <span id="finCardTotal" class="text-lg font-extrabold text-purple-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-purple-700 block mb-1">Cartão Crédito</span>
+            <span id="finCardTotal" class="text-lg font-extrabold text-purple-900">R$ 0,00</span>
           </div>
           <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-indigo-700 block mb-1">Invest. R. Fixa[cite: 2]</span>
-            <span id="finFixedInvTotal" class="text-lg font-extrabold text-indigo-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-indigo-700 block mb-1">Invest. R. Fixa</span>
+            <span id="finFixedInvTotal" class="text-lg font-extrabold text-indigo-900">R$ 0,00</span>
           </div>
           <div class="bg-teal-50/70 border border-teal-100 rounded-2xl p-3.5">
-            <span class="text-[11px] font-semibold text-teal-700 block mb-1">Invest. R. Variável[cite: 2]</span>
-            <span id="finVarInvTotal" class="text-lg font-extrabold text-teal-900">R$ 0,00[cite: 2]</span>
+            <span class="text-[11px] font-semibold text-teal-700 block mb-1">Invest. R. Variável</span>
+            <span id="finVarInvTotal" class="text-lg font-extrabold text-teal-900">R$ 0,00</span>
           </div>
         </div>
 
         <!-- LISTA DE REGISTROS -->
         <div class="space-y-4">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Lançamentos do Mês Selecionado[cite: 2]</h3>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Lançamentos do Mês Selecionado</h3>
           <div id="financeList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
             <!-- Items via JS -->
           </div>
@@ -385,7 +385,7 @@
       </div>
     </section>
 
-    <!-- NOVA ABA: CALENDÁRIO -->
+    <!-- ABA: CALENDÁRIO -->
     <section id="pillar-calendar" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -394,8 +394,8 @@
               <i data-lucide="calendar-days" class="w-5 h-5"></i>
             </div>
             <div>
-              <h2 class="font-bold text-xl text-slate-800">Calendário Integrado[cite: 2]</h2>
-              <p class="text-xs text-slate-500">Eventos pessoais, prazos de projetos e vencimento de contas[cite: 2]</p>
+              <h2 class="font-bold text-xl text-slate-800">Calendário Integrado</h2>
+              <p class="text-xs text-slate-500">Eventos pessoais, prazos de projetos e vencimento de contas</p>
             </div>
           </div>
 
@@ -406,7 +406,7 @@
               <button onclick="changeCalendarMonth(1)" class="p-1.5 text-slate-600 hover:bg-white rounded-lg transition"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
             </div>
             <button onclick="showAddEventModal()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Evento[cite: 2]
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Evento
             </button>
           </div>
         </div>
@@ -445,14 +445,14 @@
               <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
             </div>
             <div>
-              <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics[cite: 2]</h2>
-              <p class="text-xs text-slate-500">Acompanhamento e estatísticas de consistência e finanças[cite: 2]</p>
+              <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics</h2>
+              <p class="text-xs text-slate-500">Acompanhamento e estatísticas de consistência e finanças</p>
             </div>
           </div>
 
-          <!-- BOTÃO DE REFRESH / ACTUALIZAÇÃO -->
+          <!-- BOTÃO DE REFRESH -->
           <button onclick="refreshAnalytics()" class="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar Dados[cite: 2]
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar Dados
           </button>
         </div>
 
@@ -463,7 +463,7 @@
             <span id="habitSuccessRate" class="text-2xl font-extrabold text-emerald-600">0%</span>
           </div>
           <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <span class="text-slate-500 font-medium block mb-1">Tarefas Concluídas / Atrasadas[cite: 2]:</span>
+            <span class="text-slate-500 font-medium block mb-1">Tarefas Concluídas / Atrasadas:</span>
             <span id="taskStatusRatio" class="text-xl font-extrabold text-slate-800">0 / 0</span>
           </div>
           <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -482,8 +482,8 @@
                 <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Desempenho de Hábitos
               </h3>
               <div class="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-xl text-xs font-semibold">
-                <button onclick="setAnalyticsHabitsTimeframe('weekly')" id="btnHabitsWeekly" class="px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm">Semanal[cite: 2]</button>
-                <button onclick="setAnalyticsHabitsTimeframe('monthly')" id="btnHabitsMonthly" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal[cite: 2]</button>
+                <button onclick="setAnalyticsHabitsTimeframe('weekly')" id="btnHabitsWeekly" class="px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm">Semanal</button>
+                <button onclick="setAnalyticsHabitsTimeframe('monthly')" id="btnHabitsMonthly" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal</button>
               </div>
             </div>
             <div class="h-60 relative">
@@ -498,8 +498,8 @@
                 <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Status de Tarefas
               </h3>
               <div class="flex items-center gap-1 bg-white border border-slate-200 p-1 rounded-xl text-xs font-semibold">
-                <button onclick="setAnalyticsTasksTimeframe('weekly')" id="btnTasksWeekly" class="px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm">Semanal[cite: 2]</button>
-                <button onclick="setAnalyticsTasksTimeframe('monthly')" id="btnTasksMonthly" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal[cite: 2]</button>
+                <button onclick="setAnalyticsTasksTimeframe('weekly')" id="btnTasksWeekly" class="px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm">Semanal</button>
+                <button onclick="setAnalyticsTasksTimeframe('monthly')" id="btnTasksMonthly" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal</button>
               </div>
             </div>
             <div class="h-60 relative">
@@ -515,7 +515,7 @@
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
               <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Visão Financeira Anual
             </h3>
-            <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-xl" id="analyticsFinanceMonthBadge">Ano Ativo[cite: 2]</span>
+            <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-xl" id="analyticsFinanceMonthBadge">Ano Ativo</span>
           </div>
           <div class="h-72 relative">
             <canvas id="financeChart"></canvas>
@@ -558,7 +558,7 @@
       </div>
 
       <div class="mt-6 flex justify-end gap-2">
-        <button onclick="closeEditHabitModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar[cite: 2]</button>
+        <button onclick="closeEditHabitModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
         <button onclick="saveEditedHabit()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Alterações</button>
       </div>
     </div>
@@ -568,7 +568,7 @@
   <div id="financeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="financeModalTitle" class="font-bold text-base text-slate-800">Novo Registro Financeiro[cite: 2]</h3>
+        <h3 id="financeModalTitle" class="font-bold text-base text-slate-800">Novo Registro Financeiro</h3>
         <button onclick="closeFinanceModal()" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -589,12 +589,12 @@
           <div>
             <label class="block font-semibold text-slate-600 mb-1">Categoria</label>
             <select id="finType" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
-              <option value="income">Entrada / A Receber[cite: 2]</option>
-              <option value="expense">Saída / Conta[cite: 2]</option>
-              <option value="pix">PIX / Dinheiro[cite: 2]</option>
-              <option value="card">Cartão de Crédito[cite: 2]</option>
-              <option value="fixed_inv">Renda Fixa (CDB, Tesouro...)[cite: 2]</option>
-              <option value="var_inv">Renda Variável (Ações, FIIs...)[cite: 2]</option>
+              <option value="income">Entrada / A Receber</option>
+              <option value="expense">Saída / Conta</option>
+              <option value="pix">PIX / Dinheiro</option>
+              <option value="card">Cartão de Crédito</option>
+              <option value="fixed_inv">Renda Fixa (CDB, Tesouro...)</option>
+              <option value="var_inv">Renda Variável (Ações, FIIs...)</option>
             </select>
           </div>
         </div>
@@ -605,7 +605,7 @@
             <input type="month" id="finMonthVal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
           </div>
           <div>
-            <label class="block font-semibold text-slate-600 mb-1">Data de Vencimento[cite: 2]</label>
+            <label class="block font-semibold text-slate-600 mb-1">Data de Vencimento</label>
             <input type="date" id="finDueDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300 text-slate-600">
           </div>
         </div>
@@ -617,7 +617,7 @@
       </div>
 
       <div class="mt-6 flex justify-end gap-2">
-        <button onclick="closeFinanceModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar[cite: 2]</button>
+        <button onclick="closeFinanceModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
         <button onclick="saveFinanceEntry()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Registro</button>
       </div>
     </div>
@@ -627,7 +627,7 @@
   <div id="calendarEventModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between mb-4">
-        <h3 id="calModalTitle" class="font-bold text-base text-slate-800">Novo Evento[cite: 2]</h3>
+        <h3 id="calModalTitle" class="font-bold text-base text-slate-800">Novo Evento</h3>
         <button onclick="closeCalendarEventModal()" class="text-slate-400 hover:text-slate-600">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -650,8 +650,8 @@
       </div>
 
       <div class="mt-6 flex justify-end gap-2">
-        <button onclick="closeCalendarEventModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar[cite: 2]</button>
-        <button onclick="saveCalendarEvent()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Evento[cite: 2]</button>
+        <button onclick="closeCalendarEventModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
+        <button onclick="saveCalendarEvent()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Evento</button>
       </div>
     </div>
   </div>
@@ -665,8 +665,8 @@
         { id: 3, name: 'Atividade Física', targetDays: 4, logs: {} }
       ],
       goals: [
-        { id: 1, title: 'Guardar R$ 10.000 na Reserva de Emergência', category: 'Finanças[cite: 2]', year: '2026', done: false },
-        { id: 2, title: 'Ler 12 livros de desenvolvimento pessoal', category: 'Estudos[cite: 2]', year: '2026', done: true },
+        { id: 1, title: 'Guardar R$ 10.000 na Reserva de Emergência', category: 'Finanças', year: '2026', done: false },
+        { id: 2, title: 'Ler 12 livros de desenvolvimento pessoal', category: 'Estudos', year: '2026', done: true },
         { id: 3, title: 'Fazer um check-up médico completo', category: 'Saúde', year: '2026', done: false }
       ],
       projects: [
@@ -699,7 +699,6 @@
     let currentWeekOffset = 0;
     let activeTab = 'habits';
 
-    // ESTADO POMODORO
     let pomodoroState = {
       active: false,
       timer: null,
@@ -972,7 +971,7 @@
       const doneGoals = filteredGoals.filter(g => g.done).length;
       const progressPct = totalGoals > 0 ? Math.round((doneGoals / totalGoals) * 100) : 0;
 
-      document.getElementById('goalsSummaryTitle').textContent = `${doneGoals} de ${totalGoals} metas concluídas[cite: 2]`;
+      document.getElementById('goalsSummaryTitle').textContent = `${doneGoals} de ${totalGoals} metas concluídas`;
       document.getElementById('goalsProgressPct').textContent = `${progressPct}%`;
       document.getElementById('goalsProgressBar').style.width = `${progressPct}%`;
 
@@ -1093,7 +1092,7 @@
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-sm text-slate-800">${project.name}</h3>
-              <button onclick="deleteProject(${project.id})" class="text-xs text-slate-300 hover:text-rose-500 transition">Excluir Projeto[cite: 2]</button>
+              <button onclick="deleteProject(${project.id})" class="text-xs text-slate-300 hover:text-rose-500 transition">Excluir Projeto</button>
             </div>
 
             <div class="flex items-center justify-between text-xs text-slate-500">
@@ -1112,7 +1111,7 @@
           <div class="flex items-center gap-2 pt-2">
             <input type="text" id="newTaskInput-${project.id}" placeholder="Nova tarefa..." class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
             <input type="date" id="newTaskDate-${project.id}" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none">
-            <button onclick="addTask(${project.id})" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition">Adicionar[cite: 2]</button>
+            <button onclick="addTask(${project.id})" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition">Adicionar</button>
           </div>
         `;
 
@@ -1266,12 +1265,12 @@
         if (f.type === 'var_inv') varInv += val;
 
         let typeBadgeHtml = '';
-        if (f.type === 'income') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Entrada[cite: 2]</span>`;
-        else if (f.type === 'expense') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800">Saída[cite: 2]</span>`;
-        else if (f.type === 'pix') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">PIX/Dinheiro[cite: 2]</span>`;
-        else if (f.type === 'card') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800">Cartão[cite: 2]</span>`;
-        else if (f.type === 'fixed_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-800">Renda Fixa[cite: 2]</span>`;
-        else if (f.type === 'var_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800">Renda Variável[cite: 2]</span>`;
+        if (f.type === 'income') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Entrada</span>`;
+        else if (f.type === 'expense') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800">Saída</span>`;
+        else if (f.type === 'pix') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">PIX/Dinheiro</span>`;
+        else if (f.type === 'card') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800">Cartão</span>`;
+        else if (f.type === 'fixed_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-800">Renda Fixa</span>`;
+        else if (f.type === 'var_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800">Renda Variável</span>`;
 
         let dueDateHtml = '';
         if (f.dueDate) {
@@ -1321,7 +1320,7 @@
 
     function showAddFinanceModal() {
       document.getElementById('editFinanceId').value = '';
-      document.getElementById('financeModalTitle').textContent = 'Novo Registro Financeiro[cite: 2]';
+      document.getElementById('financeModalTitle').textContent = 'Novo Registro Financeiro';
       document.getElementById('finTitle').value = '';
       document.getElementById('finAmount').value = '';
       document.getElementById('finType').value = 'income';
@@ -1419,15 +1418,12 @@
       const firstDayOfMonth = new Date(year, month, 1);
       const lastDayOfMonth = new Date(year, month + 1, 0);
 
-      // Ajuste para segunda-feira como início da semana (0 = Segunda, 6 = Domingo)
       let startingDay = firstDayOfMonth.getDay() - 1;
       if (startingDay === -1) startingDay = 6;
 
       const totalDays = lastDayOfMonth.getDate();
       const todayStr = new Date().toISOString().slice(0, 10);
 
-      // Coletar itens integrados
-      // 1. Eventos pessoais
       let dayItems = {};
       if (appState.events) {
         appState.events.forEach(ev => {
@@ -1436,7 +1432,6 @@
         });
       }
 
-      // 2. Tarefas de projetos com data limite
       if (appState.projects) {
         appState.projects.forEach(p => {
           if (p.tasks) {
@@ -1450,7 +1445,6 @@
         });
       }
 
-      // 3. Contas/lançamentos financeiros com vencimento
       if (appState.finances) {
         appState.finances.forEach(f => {
           if (f.dueDate) {
@@ -1460,7 +1454,6 @@
         });
       }
 
-      // Renderizar dias vazios anteriores
       const prevMonthLastDay = new Date(year, month, 0).getDate();
       for (let i = startingDay - 1; i >= 0; i--) {
         const dayNum = prevMonthLastDay - i;
@@ -1470,7 +1463,6 @@
         grid.appendChild(cell);
       }
 
-      // Renderizar dias do mês atual
       for (let day = 1; day <= totalDays; day++) {
         const formattedMonth = String(month + 1).padStart(2, '0');
         const formattedDay = String(day).padStart(2, '0');
@@ -1520,7 +1512,6 @@
         grid.appendChild(cell);
       }
 
-      // Completar o grid até fechar as semanas
       const totalCellsPrinted = startingDay + totalDays;
       const remainingCells = totalCellsPrinted % 7 === 0 ? 0 : 7 - (totalCellsPrinted % 7);
       for (let i = 1; i <= remainingCells; i++) {
@@ -1535,7 +1526,7 @@
 
     function showAddEventModal() {
       document.getElementById('editCalendarEventId').value = '';
-      document.getElementById('calModalTitle').textContent = 'Novo Evento[cite: 2]';
+      document.getElementById('calModalTitle').textContent = 'Novo Evento';
       document.getElementById('calEventTitle').value = '';
       document.getElementById('calEventDate').value = new Date().toISOString().slice(0, 10);
       document.getElementById('calEventDesc').value = '';
@@ -1544,7 +1535,7 @@
 
     function showAddEventModalForDate(dateStr) {
       document.getElementById('editCalendarEventId').value = '';
-      document.getElementById('calModalTitle').textContent = 'Novo Evento[cite: 2]';
+      document.getElementById('calModalTitle').textContent = 'Novo Evento';
       document.getElementById('calEventTitle').value = '';
       document.getElementById('calEventDate').value = dateStr;
       document.getElementById('calEventDesc').value = '';
@@ -1627,7 +1618,7 @@
         });
       });
 
-      document.getElementById('taskStatusRatio').textContent = `${completedTasks} concluídas / ${overdueTasks} atrasadas[cite: 2]`;
+      document.getElementById('taskStatusRatio').textContent = `${completedTasks} concluídas / ${overdueTasks} atrasadas`;
       document.getElementById('totalPomodorosCount').textContent = `🍅 ${totalPomodoros} ciclos`;
 
       renderHabitsAnalyticsChart();
@@ -1778,7 +1769,7 @@
       tasksChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Concluídas', 'Em Aberto', 'Atrasadas[cite: 2]'],
+          labels: ['Concluídas', 'Em Aberto', 'Atrasadas'],
           datasets: [{
             data: [doneCount, pendingCount, overdueCount],
             backgroundColor: ['#6366F1', '#F59E0B', '#EF4444'],
@@ -1830,7 +1821,7 @@
           datasets: [
             {
               type: 'line',
-              label: 'Entradas / Ganhos[cite: 2]',
+              label: 'Entradas / Ganhos',
               data: monthlyIncome,
               borderColor: '#059669',
               backgroundColor: '#10B981',
@@ -1841,7 +1832,7 @@
             },
             {
               type: 'line',
-              label: 'Investimentos[cite: 2]',
+              label: 'Investimentos',
               data: monthlyInvestments,
               borderColor: '#4338CA',
               backgroundColor: '#6366F1',
@@ -1852,7 +1843,7 @@
             },
             {
               type: 'bar',
-              label: 'Gastos Totais[cite: 2]',
+              label: 'Gastos Totais',
               data: monthlyExpenses,
               backgroundColor: 'rgba(244, 63, 94, 0.4)',
               borderColor: '#F43F5E',
