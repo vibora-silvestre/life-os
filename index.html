@@ -155,7 +155,7 @@
 
   <main class="max-w-7xl mx-auto">
 
-    <!-- PILAR 1: HÁBITOS (Com Meta Semanal e Progresso) -->
+    <!-- PILAR 1: HÁBITOS -->
     <section id="pillar-habits" class="pillar-content space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -222,7 +222,7 @@
       </div>
     </section>
 
-    <!-- PILAR NOVO: METAS ANUAIS -->
+    <!-- PILAR: METAS ANUAIS -->
     <section id="pillar-goals" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6 space-y-6">
         <div class="flex items-center justify-between flex-wrap gap-3">
@@ -288,7 +288,7 @@
       </div>
     </section>
 
-    <!-- PILAR 2: PROJETOS & TAREFAS (Com Progresso e Estatísticas de Conclusão) -->
+    <!-- PILAR 2: PROJETOS & TAREFAS -->
     <section id="pillar-projects" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -325,7 +325,7 @@
       </div>
     </section>
 
-    <!-- PILAR 3: FINANÇAS (Com PIX, Renda Fixa/Variável e Observação) -->
+    <!-- PILAR 3: FINANÇAS -->
     <section id="pillar-finances" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -344,7 +344,7 @@
           </button>
         </div>
 
-        <!-- CARDS DE RESUMO FINANCEIRO AMPLIADOS -->
+        <!-- CARDS DE RESUMO FINANCEIRO -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-8">
           <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5">
             <span class="text-[11px] font-semibold text-emerald-700 block mb-1">Entradas</span>
@@ -411,7 +411,7 @@
           </div>
         </div>
 
-        <!-- GRID DE GRÁFICOS: HÁBITOS E TAREFAS (COM ALTERNÂNCIA SEMANAL / MENSAL) -->
+        <!-- GRID DE GRÁFICOS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           
           <!-- SEÇÃO GRÁFICO HÁBITOS -->
@@ -634,6 +634,7 @@
 
     function saveData() {
       localStorage.setItem('life_os_data', JSON.stringify(appState));
+      setupMonthSelector();
       renderAll();
     }
 
@@ -648,18 +649,38 @@
 
     function setupMonthSelector() {
       const select = document.getElementById('monthSelector');
+      if (!select) return;
       select.innerHTML = '';
+
+      const uniqueMonths = new Set();
       const today = new Date();
+
       for (let i = -6; i <= 6; i++) {
         const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-        const val = d.toISOString().slice(0, 7);
-        const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        uniqueMonths.add(d.toISOString().slice(0, 7));
+      }
+
+      if (selectedMonth) uniqueMonths.add(selectedMonth);
+
+      if (appState.finances) {
+        appState.finances.forEach(f => {
+          if (f.month) uniqueMonths.add(f.month);
+        });
+      }
+
+      const sortedMonths = Array.from(uniqueMonths).sort();
+
+      sortedMonths.forEach(val => {
+        const [year, month] = val.split('-');
+        const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 1);
+        const label = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        
         const opt = document.createElement('option');
         opt.value = val;
         opt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
         if (val === selectedMonth) opt.selected = true;
         select.appendChild(opt);
-      }
+      });
     }
 
     function changeMonth(m) {
@@ -667,12 +688,9 @@
       renderAll();
     }
 
-    // --- STREAMING_CHUNK:Implementing Habit Progress & Monday-based Week logic... ---
-    // CÁLCULO DE SEMANA COM INÍCIO NA SEGUNDA-FEIRA
     function getWeekDatesMondayStart(offset = 0) {
       const curr = new Date();
-      const dayOfWeek = curr.getDay(); // 0 = Dom, 1 = Seg, ...
-      // Distância para a segunda-feira da semana atual
+      const dayOfWeek = curr.getDay();
       const distanceToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek) + (offset * 7);
       
       const dates = [];
@@ -721,7 +739,6 @@
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50/60 transition';
 
-        // Calcular progresso na semana ativa
         let completedCount = 0;
         dates.forEach(d => {
           if (habit.logs && habit.logs[d]) completedCount++;
@@ -744,8 +761,6 @@
 
         tr.innerHTML = `
           <td class="py-3 px-2 font-medium text-slate-700">${habit.name}</td>
-          
-          <!-- PROGRESSO E META SEMANAL -->
           <td class="py-3 px-2">
             <div class="space-y-1">
               <div class="flex items-center justify-between text-[11px] font-semibold">
@@ -757,9 +772,7 @@
               </div>
             </div>
           </td>
-
           ${daysHtml}
-          
           <td class="py-3 px-2 text-right">
             <div class="flex items-center justify-end gap-1">
               <button onclick="openEditHabitModal(${habit.id})" class="p-1.5 text-slate-400 hover:text-emerald-600 transition" title="Editar hábito">
@@ -776,7 +789,31 @@
       lucide.createIcons();
     }
 
-    // --- STREAMING_CHUNK:Implementing Habit Editing Modal Logic... ---
+    function toggleHabitLog(id, dateStr) {
+      const habit = appState.habits.find(h => h.id === id);
+      if (habit) {
+        if (!habit.logs) habit.logs = {};
+        habit.logs[dateStr] = !habit.logs[dateStr];
+        saveData();
+      }
+    }
+
+    function addHabit() {
+      const input = document.getElementById('newHabitInput');
+      const targetSelect = document.getElementById('newHabitTarget');
+      if (!input.value.trim()) return;
+
+      appState.habits.push({
+        id: Date.now(),
+        name: input.value.trim(),
+        targetDays: parseInt(targetSelect.value, 10),
+        logs: {}
+      });
+
+      input.value = '';
+      saveData();
+    }
+
     function openEditHabitModal(id) {
       const habit = appState.habits.find(h => h.id === id);
       if (!habit) return;
@@ -806,7 +843,6 @@
       closeEditHabitModal();
     }
 
-    // --- STREAMING_CHUNK:Implementing Annual Goals Pillar Logic... ---
     function renderGoals() {
       const listContainer = document.getElementById('goalsList');
       if (!listContainer) return;
@@ -884,8 +920,6 @@
       saveData();
     }
 
-    // --- STREAMING_CHUNK:Implementing Project Tasks & Progress calculation... ---
-    // PROJETOS, TAREFAS E CONTADORES
     function renderProjects() {
       const container = document.getElementById('projectsContainer');
       container.innerHTML = '';
@@ -915,7 +949,6 @@
               <div class="flex items-center gap-3 flex-1 min-w-0">
                 <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${project.id}, ${t.id})" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-400 cursor-pointer">
                 <span class="text-xs font-medium ${t.done ? 'line-through text-slate-400' : 'text-slate-700'} truncate">${t.name}</span>
-                
                 ${t.pomodoros ? `<span class="text-[10px] font-bold px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md inline-flex items-center gap-1">🍅 x${t.pomodoros}</span>` : ''}
               </div>
 
@@ -939,14 +972,12 @@
         }).join('');
 
         projEl.innerHTML = `
-          <!-- CABEÇALHO DO PROJETO COM PROGRESSO -->
           <div class="space-y-2">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-sm text-slate-800">${project.name}</h3>
               <button onclick="deleteProject(${project.id})" class="text-xs text-slate-300 hover:text-rose-500 transition">Excluir Projeto</button>
             </div>
 
-            <!-- ESTATÍSTICAS E BARRA DE PROGRESSO -->
             <div class="flex items-center justify-between text-xs text-slate-500">
               <span class="font-medium">${completedTasks} concluídas • <strong class="text-indigo-600">${openTasks} em aberto</strong> (Total: ${totalTasks})</span>
               <span class="font-extrabold text-slate-700">${progressPct}%</span>
@@ -960,7 +991,6 @@
             ${tasksHtml || '<p class="text-xs text-slate-400 italic">Nenhuma tarefa registrada neste projeto.</p>'}
           </div>
 
-          <!-- CRIAR TAREFA -->
           <div class="flex items-center gap-2 pt-2">
             <input type="text" id="newTaskInput-${project.id}" placeholder="Nova tarefa..." class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
             <input type="date" id="newTaskDate-${project.id}" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none">
@@ -1026,7 +1056,6 @@
       }
     }
 
-    // TIMER POMODORO
     function startPomodoroForTask(pId, tId, taskName, projName) {
       pomodoroState.pId = pId;
       pomodoroState.tId = tId;
@@ -1100,7 +1129,6 @@
       document.getElementById('pomodoroBanner').classList.add('hidden');
     }
 
-    // --- STREAMING_CHUNK:Implementing Extended Finances & Investment Logic... ---
     // MÓDULO DE FINANÇAS EXPANDIDO
     function renderFinances() {
       document.getElementById('financeMonthLabel').textContent = `Mês selecionado: ${selectedMonth}`;
@@ -1119,7 +1147,6 @@
         if (f.type === 'fixed_inv') fixedInv += val;
         if (f.type === 'var_inv') varInv += val;
 
-        // Definir badges e estilos para as diferentes categorias
         let typeBadgeHtml = '';
         if (f.type === 'income') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Entrada</span>`;
         else if (f.type === 'expense') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800">Saída</span>`;
@@ -1189,10 +1216,16 @@
         notes: notes ? notes.trim() : ''
       });
 
+      // Atualiza o mês ativo para o mês selecionado no formulário
+      if (month) {
+        selectedMonth = month;
+      }
+
       closeFinanceModal();
       document.getElementById('finTitle').value = '';
       document.getElementById('finAmount').value = '';
       document.getElementById('finNotes').value = '';
+      
       saveData();
     }
 
@@ -1201,7 +1234,6 @@
       saveData();
     }
 
-    // ANALYTICS DE DESEMPENHO
     function renderAnalytics() {
       let totalLogs = 0;
       let completedLogs = 0;
@@ -1285,9 +1317,8 @@
           actualData.push(count);
         });
       } else {
-        // Mensal: calcula com base no mês selecionado
         appState.habits.forEach(h => {
-          const targetMonthly = (h.targetDays || 5) * 4; // Aproximação de 4 semanas
+          const targetMonthly = (h.targetDays || 5) * 4;
           targetData.push(targetMonthly);
           let count = 0;
           if (h.logs) {
@@ -1362,7 +1393,6 @@
           });
         });
       } else {
-        // Mensal
         appState.projects.forEach(p => {
           p.tasks.forEach(t => {
             if (t.dueDate && t.dueDate.startsWith(selectedMonth)) {
@@ -1410,7 +1440,6 @@
       const monthlyExpenses = new Array(12).fill(0);
       const monthlyInvestments = new Array(12).fill(0);
 
-      // Agrupa os registros financeiros pelos 12 meses do ano ativo
       appState.finances.forEach(f => {
         if (f.month && f.month.startsWith(currentYear)) {
           const mIdx = parseInt(f.month.slice(5, 7), 10) - 1;
@@ -1485,7 +1514,6 @@
       });
     }
 
-    // EXPORTAR E IMPORTAR
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
       const downloadAnchor = document.createElement('a');
