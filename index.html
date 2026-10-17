@@ -524,7 +524,7 @@
       <div class="space-y-4 text-xs">
         <div>
           <label class="block font-semibold text-slate-600 mb-1">Título / Identificação</label>
-          <input type="text" id="finTitle" placeholder="Ex: Salário, Supermercado, Ações..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          <input type="text" id="finTitle" placeholder="Ex: Salário, Supermercado, Aluguel..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
         </div>
         
         <div class="grid grid-cols-2 gap-3">
@@ -545,9 +545,15 @@
           </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">Mês de Referência</label>
-          <input type="month" id="finMonthVal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Mês de Referência</label>
+            <input type="month" id="finMonthVal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Data de Vencimento</label>
+            <input type="date" id="finDueDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300 text-slate-600">
+          </div>
         </div>
 
         <div>
@@ -587,10 +593,10 @@
         }
       ],
       finances: [
-        { id: 1, title: 'Salário / Prolabore', amount: 5000, type: 'income', month: '2026-10', notes: 'Pagamento mensal principal' },
-        { id: 2, title: 'Aluguel & Contas', amount: 1600, type: 'expense', month: '2026-10', notes: 'Transferência automática' },
-        { id: 3, title: 'Aporte CDB 110% CDI', amount: 500, type: 'fixed_inv', month: '2026-10', notes: 'Reserva de emergência' },
-        { id: 4, title: 'Mercado Semanal', amount: 250, type: 'pix', month: '2026-10', notes: 'Compras do mês via PIX' }
+        { id: 1, title: 'Salário / Prolabore', amount: 5000, type: 'income', month: '2026-10', dueDate: '2026-10-05', notes: 'Pagamento mensal principal' },
+        { id: 2, title: 'Aluguel & Contas', amount: 1600, type: 'expense', month: '2026-10', dueDate: '2026-10-10', notes: 'Transferência automática' },
+        { id: 3, title: 'Aporte CDB 110% CDI', amount: 500, type: 'fixed_inv', month: '2026-10', dueDate: '2026-10-15', notes: 'Reserva de emergência' },
+        { id: 4, title: 'Mercado Semanal', amount: 250, type: 'pix', month: '2026-10', dueDate: '2026-10-12', notes: 'Compras do mês via PIX' }
       ]
     };
 
@@ -655,7 +661,6 @@
       renderAnalytics();
     }
 
-    // FUNÇÃO DE REFRESH MANUAL PARA O ANALYTICS
     function refreshAnalytics() {
       const saved = localStorage.getItem('life_os_data');
       if (saved) {
@@ -1173,13 +1178,20 @@
         else if (f.type === 'fixed_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-800">Renda Fixa</span>`;
         else if (f.type === 'var_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800">Renda Variável</span>`;
 
+        let dueDateHtml = '';
+        if (f.dueDate) {
+          const formattedDate = new Date(f.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+          dueDateHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 inline-flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i> Venc: ${formattedDate}</span>`;
+        }
+
         const item = document.createElement('div');
         item.className = 'p-3 bg-slate-50 rounded-xl text-xs border border-slate-100 space-y-1.5';
         item.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               ${typeBadgeHtml}
               <span class="font-bold text-slate-800">${f.title}</span>
+              ${dueDateHtml}
             </div>
             <div class="flex items-center gap-3">
               <span class="font-extrabold text-slate-800">R$ ${val.toFixed(2)}</span>
@@ -1219,6 +1231,7 @@
       document.getElementById('finAmount').value = '';
       document.getElementById('finType').value = 'income';
       document.getElementById('finMonthVal').value = selectedMonth;
+      document.getElementById('finDueDate').value = '';
       document.getElementById('finNotes').value = '';
       document.getElementById('financeModal').classList.remove('hidden');
     }
@@ -1233,6 +1246,7 @@
       document.getElementById('finAmount').value = entry.amount;
       document.getElementById('finType').value = entry.type;
       document.getElementById('finMonthVal').value = entry.month || selectedMonth;
+      document.getElementById('finDueDate').value = entry.dueDate || '';
       document.getElementById('finNotes').value = entry.notes || '';
       
       document.getElementById('financeModal').classList.remove('hidden');
@@ -1248,6 +1262,7 @@
       const amount = document.getElementById('finAmount').value;
       const type = document.getElementById('finType').value;
       const month = document.getElementById('finMonthVal').value;
+      const dueDate = document.getElementById('finDueDate').value;
       const notes = document.getElementById('finNotes').value;
 
       if (!title || !amount) return;
@@ -1259,6 +1274,7 @@
           entry.amount = parseFloat(amount);
           entry.type = type;
           entry.month = month;
+          entry.dueDate = dueDate || null;
           entry.notes = notes ? notes.trim() : '';
         }
       } else {
@@ -1268,6 +1284,7 @@
           amount: parseFloat(amount),
           type,
           month,
+          dueDate: dueDate || null,
           notes: notes ? notes.trim() : ''
         });
       }
