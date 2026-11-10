@@ -695,8 +695,12 @@
     let appState = JSON.parse(localStorage.getItem('life_os_data')) || DEFAULT_DATA;
     if (!appState.goals) appState.goals = DEFAULT_DATA.goals;
     if (!appState.events) appState.events = DEFAULT_DATA.events || [];
+    if (!appState.finances) appState.finances = DEFAULT_DATA.finances || [];
+
     let currentWeekOffset = 0;
     let activeTab = 'habits';
+    let selectedMonth = new Date().toISOString().slice(0, 7); // YYYY-MM atual
+    let collapsedCompletedProjects = {};
 
     // ESTADO POMODORO
     let pomodoroState = {
@@ -719,38 +723,35 @@
       renderAll();
     });
 
-    function switchTab(tabId) {
-      activeTab = tabId;
-      document.querySelectorAll('.pillar-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    function setupMonthSelector() {
+      const selector = document.getElementById('monthSelector');
+      if (!selector) return;
 
-      const targetPillar = document.getElementById(`pillar-${tabId}`);
-      const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+      selector.innerHTML = '';
+      const now = new Date();
+      const currentYear = now.getFullYear();
 
-      if (targetPillar) targetPillar.classList.remove('hidden');
-      if (targetBtn) targetBtn.classList.add('active');
-
-      if (tabId === 'goals') {
-        renderGoals();
-      } else if (tabId === 'analytics') {
-        renderAnalytics();
+      // Monta lista de meses (anos: anterior, atual e próximo)
+      const months = [];
+      for (let y = currentYear - 1; y <= currentYear + 1; y++) {
+        for (let m = 1; m <= 12; m++) {
+          const monthStr = `${y}-${m.toString().padStart(2, '0')}`;
+          months.push(monthStr);
+        }
       }
+
+      months.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m;
+        const [y, monthNum] = m.split('-');
+        const dateObj = new Date(parseInt(y), parseInt(monthNum) - 1, 1);
+        const nameStr = dateObj.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+        option.textContent = nameStr.toUpperCase();
+        if (m === selectedMonth) option.selected = true;
+        selector.appendChild(option);
+      });
     }
 
-    function saveData() {
-      localStorage.setItem('life_os_data', JSON.stringify(appState));
-      renderAll();
-    }
-
-    function renderAll() {
-      lucide.createIcons();
-      renderHabits();
-      renderGoals();
-      renderProjects();
-      renderCalendar();
-      renderFinances();
-      renderAnalytics();
-    }
     function switchTab(tabId) {
       activeTab = tabId;
       document.querySelectorAll('.pillar-content').forEach(el => el.classList.add('hidden'));
@@ -766,9 +767,26 @@
         renderGoals();
       } else if (tabId === 'calendar') {
         renderCalendar();
+      } else if (tabId === 'finances') {
+        renderFinances();
       } else if (tabId === 'analytics') {
         renderAnalytics();
       }
+    }
+
+    function saveData() {
+      localStorage.setItem('life_os_data', JSON.stringify(appState));
+      renderAll();
+    }
+
+    function renderAll() {
+      if (window.lucide) lucide.createIcons();
+      renderHabits();
+      renderGoals();
+      renderProjects();
+      renderCalendar();
+      renderFinances();
+      renderAnalytics();
     }
 
     function changeMonth(m) {
@@ -801,9 +819,11 @@
       
       const startDateStr = new Date(dates[0] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       const endDateStr = new Date(dates[6] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-      document.getElementById('currentWeekLabel').textContent = `${startDateStr} a ${endDateStr}`;
+      const weekLabelEl = document.getElementById('currentWeekLabel');
+      if (weekLabelEl) weekLabelEl.textContent = `${startDateStr} a ${endDateStr}`;
 
       const container = document.getElementById('dayHeadersContainer');
+      if (!container) return;
       container.innerHTML = '';
       
       const todayStr = new Date().toISOString().slice(0, 10);
@@ -821,6 +841,7 @@
       });
 
       const tbody = document.getElementById('habitsTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       appState.habits.forEach(habit => {
@@ -877,7 +898,7 @@
         `;
         tbody.appendChild(tr);
       });
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function toggleHabitLog(habitId, dateStr) {
@@ -892,7 +913,7 @@
     function addHabit() {
       const input = document.getElementById('newHabitInput');
       const targetSelect = document.getElementById('newHabitTarget');
-      if (!input.value.trim()) return;
+      if (!input || !input.value.trim()) return;
 
       appState.habits.push({
         id: Date.now(),
@@ -945,9 +966,13 @@
       const doneGoals = filteredGoals.filter(g => g.done).length;
       const progressPct = totalGoals > 0 ? Math.round((doneGoals / totalGoals) * 100) : 0;
 
-      document.getElementById('goalsSummaryTitle').textContent = `${doneGoals} de ${totalGoals} metas concluídas`;
-      document.getElementById('goalsProgressPct').textContent = `${progressPct}%`;
-      document.getElementById('goalsProgressBar').style.width = `${progressPct}%`;
+      const titleEl = document.getElementById('goalsSummaryTitle');
+      const pctEl = document.getElementById('goalsProgressPct');
+      const barEl = document.getElementById('goalsProgressBar');
+
+      if (titleEl) titleEl.textContent = `${doneGoals} de ${totalGoals} metas concluídas`;
+      if (pctEl) pctEl.textContent = `${progressPct}%`;
+      if (barEl) barEl.style.width = `${progressPct}%`;
 
       listContainer.innerHTML = '';
 
@@ -971,20 +996,20 @@
         listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">Nenhuma meta cadastrada para o ano de ${yearFilter}.</p>`;
       }
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function addGoal() {
       const titleInput = document.getElementById('newGoalTitle');
       const categorySelect = document.getElementById('newGoalCategory');
-      const yearFilter = document.getElementById('annualGoalYearFilter').value || '2026';
+      const yearFilter = document.getElementById('annualGoalYearFilter')?.value || '2026';
 
-      if (!titleInput.value.trim()) return;
+      if (!titleInput || !titleInput.value.trim()) return;
 
       appState.goals.push({
         id: Date.now(),
         title: titleInput.value.trim(),
-        category: categorySelect.value,
+        category: categorySelect ? categorySelect.value : 'Pessoal',
         year: yearFilter,
         done: false
       });
@@ -1013,7 +1038,7 @@
 
     function addProject() {
       const input = document.getElementById('newProjectInput');
-      if (!input.value.trim()) return;
+      if (!input || !input.value.trim()) return;
 
       appState.projects.push({
         id: Date.now(),
@@ -1032,6 +1057,7 @@
 
     function renderProjects() {
       const container = document.getElementById('projectsContainer');
+      if (!container) return;
       container.innerHTML = '';
 
       let dueSoonTotal = 0;
@@ -1157,9 +1183,11 @@
         container.appendChild(projEl);
       });
 
-      document.getElementById('dueSoonCount').textContent = dueSoonTotal;
-      document.getElementById('overdueCount').textContent = overdueTotal;
-      lucide.createIcons();
+      const dueSoonEl = document.getElementById('dueSoonCount');
+      const overdueEl = document.getElementById('overdueCount');
+      if (dueSoonEl) dueSoonEl.textContent = dueSoonTotal;
+      if (overdueEl) overdueEl.textContent = overdueTotal;
+      if (window.lucide) lucide.createIcons();
     }
 
     function toggleCompletedTasksSection(pId) {
@@ -1171,7 +1199,7 @@
       const titleInput = document.getElementById(`newTaskInput-${pId}`);
       const dateInput = document.getElementById(`newTaskDate-${pId}`);
       const recurrenceSelect = document.getElementById(`newTaskRecurrence-${pId}`);
-      if (!titleInput.value.trim()) return;
+      if (!titleInput || !titleInput.value.trim()) return;
 
       const project = appState.projects.find(p => p.id === pId);
       if (project) {
@@ -1302,7 +1330,6 @@
             pomodoroState.timeLeft = 25 * 60;
             updatePomodoroDisplay();
 
-            // Incrementa contagem de pomodoros na tarefa selecionada
             if (pomodoroState.pId && pomodoroState.tId) {
               const project = appState.projects.find(p => p.id === pomodoroState.pId);
               if (project) {
@@ -1345,12 +1372,16 @@
 
       const dateObj = new Date(year, monthIdx, 1);
       const monthName = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-      document.getElementById('calendarMonthTitle').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      const monthTitleEl = document.getElementById('calendarMonthTitle');
+      if (monthTitleEl) {
+        monthTitleEl.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+      }
 
       const firstDayWeekIdx = new Date(year, monthIdx, 1).getDay(); // 0 = Dom
       const totalDaysMonth = new Date(year, monthIdx + 1, 0).getDate();
 
       const grid = document.getElementById('calendarGrid');
+      if (!grid) return;
       grid.innerHTML = '';
 
       const todayStr = new Date().toISOString().slice(0, 10);
@@ -1366,7 +1397,7 @@
       for (let day = 1; day <= totalDaysMonth; day++) {
         const dayStr = `${year}-${(monthIdx + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         const isToday = dayStr === todayStr;
-        const dayEvents = appState.events.filter(e => e.date === dayStr);
+        const dayEvents = (appState.events || []).filter(e => e.date === dayStr);
 
         const cell = document.createElement('div');
         cell.className = `h-24 p-1.5 rounded-xl border transition flex flex-col justify-between overflow-hidden ${isToday ? 'bg-rose-50/60 border-rose-300 ring-2 ring-rose-200' : 'bg-white border-slate-100 hover:border-slate-200'}`;
@@ -1391,9 +1422,10 @@
 
       // Render da lista lateral de compromissos do mês
       const eventsListContainer = document.getElementById('eventsList');
+      if (!eventsListContainer) return;
       eventsListContainer.innerHTML = '';
 
-      const monthEvents = appState.events
+      const monthEvents = (appState.events || [])
         .filter(e => e.date && e.date.startsWith(selectedMonth))
         .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -1418,7 +1450,7 @@
         eventsListContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Nenhum evento neste mês.</p>`;
       }
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function addEvent() {
@@ -1426,7 +1458,7 @@
       const dateInput = document.getElementById('newEventDate');
       const descInput = document.getElementById('newEventDesc');
 
-      if (!titleInput.value.trim() || !dateInput.value) return;
+      if (!titleInput || !titleInput.value.trim() || !dateInput || !dateInput.value) return;
 
       if (!appState.events) appState.events = [];
 
@@ -1438,7 +1470,7 @@
       });
 
       titleInput.value = '';
-      descInput.value = '';
+      if (descInput) descInput.value = '';
       saveData();
     }
 
@@ -1450,11 +1482,14 @@
 
     // MÓDULO DE FINANÇAS EXPANDIDO
     function renderFinances() {
-      document.getElementById('financeMonthLabel').textContent = `Mês selecionado: ${selectedMonth}`;
-      const filtered = appState.finances.filter(f => f.month === selectedMonth);
+      const monthLabel = document.getElementById('financeMonthLabel');
+      if (monthLabel) monthLabel.textContent = `Mês selecionado: ${selectedMonth}`;
+      
+      const filtered = (appState.finances || []).filter(f => f.month === selectedMonth);
 
       let income = 0, expense = 0, pix = 0, card = 0, fixedInv = 0, varInv = 0;
       const listContainer = document.getElementById('financeList');
+      if (!listContainer) return;
       listContainer.innerHTML = '';
 
       filtered.forEach(f => {
@@ -1505,7 +1540,7 @@
       document.getElementById('finFixedInvTotal').textContent = `R$ ${fixedInv.toFixed(2)}`;
       document.getElementById('finVarInvTotal').textContent = `R$ ${varInv.toFixed(2)}`;
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function showAddFinanceModal() {
@@ -1526,6 +1561,8 @@
 
       if (!title || !amount) return;
 
+      if (!appState.finances) appState.finances = [];
+
       appState.finances.push({
         id: Date.now(),
         title,
@@ -1543,6 +1580,7 @@
     }
 
     function deleteFinance(id) {
+      if (!appState.finances) return;
       appState.finances = appState.finances.filter(f => f.id !== id);
       saveData();
     }
@@ -1573,7 +1611,9 @@
       const prevRate = prevWeekTarget > 0 ? Math.round((prevWeekDone / prevWeekTarget) * 100) : 0;
       const diff = currentRate - prevRate;
 
-      document.getElementById('habitSuccessRate').textContent = `${currentRate}%`;
+      const rateEl = document.getElementById('habitSuccessRate');
+      if (rateEl) rateEl.textContent = `${currentRate}%`;
+      
       const diffEl = document.getElementById('habitRateDiff');
       if (diffEl) {
         const sign = diff >= 0 ? '+' : '';
@@ -1595,8 +1635,10 @@
         });
       });
 
-      document.getElementById('taskStatusRatio').textContent = `${completedTasks} concluídas / ${overdueTasks} atrasadas`;
-      document.getElementById('totalPomodorosCount').textContent = `🍅 ${totalPomodoros} ciclos`;
+      const statusEl = document.getElementById('taskStatusRatio');
+      const pomoEl = document.getElementById('totalPomodorosCount');
+      if (statusEl) statusEl.textContent = `${completedTasks} concluídas / ${overdueTasks} atrasadas`;
+      if (pomoEl) pomoEl.textContent = `🍅 ${totalPomodoros} ciclos`;
 
       renderHabitsAnalyticsChart();
       renderTasksAnalyticsChart();
@@ -1608,11 +1650,11 @@
       const btnW = document.getElementById('btnHabitsWeekly');
       const btnM = document.getElementById('btnHabitsMonthly');
       if (tf === 'weekly') {
-        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
-        btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+        if (btnW) btnW.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
+        if (btnM) btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       } else {
-        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
-        btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+        if (btnM) btnM.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
+        if (btnW) btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       }
       renderHabitsAnalyticsChart();
     }
@@ -1622,11 +1664,11 @@
       const btnW = document.getElementById('btnTasksWeekly');
       const btnM = document.getElementById('btnTasksMonthly');
       if (tf === 'weekly') {
-        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
-        btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+        if (btnW) btnW.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
+        if (btnM) btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       } else {
-        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
-        btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+        if (btnM) btnM.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
+        if (btnW) btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       }
       renderTasksAnalyticsChart();
     }
@@ -1767,14 +1809,15 @@
       const ctx = canvas.getContext('2d');
 
       const currentYear = selectedMonth ? selectedMonth.slice(0, 4) : new Date().getFullYear().toString();
-      document.getElementById('analyticsFinanceMonthBadge').textContent = `Ano: ${currentYear}`;
+      const badgeEl = document.getElementById('analyticsFinanceMonthBadge');
+      if (badgeEl) badgeEl.textContent = `Ano: ${currentYear}`;
 
       const monthsShort = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       const monthlyIncome = new Array(12).fill(0);
       const monthlyExpenses = new Array(12).fill(0);
       const monthlyInvestments = new Array(12).fill(0);
 
-      appState.finances.forEach(f => {
+      (appState.finances || []).forEach(f => {
         if (f.month && f.month.startsWith(currentYear)) {
           const mIdx = parseInt(f.month.slice(5, 7), 10) - 1;
           if (mIdx >= 0 && mIdx < 12) {
