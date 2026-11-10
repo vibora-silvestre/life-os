@@ -145,6 +145,9 @@
     <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
       <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Projetos & Tarefas
     </button>
+    <button onclick="switchTab('calendar')" id="tabBtn-calendar" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="calendar" class="w-4 h-4 text-rose-500"></i> Calendário
+    </button>
     <button onclick="switchTab('finances')" id="tabBtn-finances" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
       <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Finanças
     </button>
@@ -321,6 +324,67 @@
           <button onclick="addProject()" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
             <i data-lucide="folder-plus" class="w-4 h-4"></i> Criar Projeto
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR: CALENDÁRIO & EVENTOS -->
+    <section id="pillar-calendar" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-rose-100 rounded-xl text-rose-700">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Calendário & Compromissos</h2>
+              <p class="text-xs text-slate-500">Visualização mensal de eventos e agenda de atividades</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span id="calendarMonthTitle" class="text-sm font-extrabold text-slate-700 px-3 py-1.5 bg-slate-100 rounded-xl border border-slate-200"></span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- GRADE DO CALENDÁRIO MENSAL -->
+          <div class="lg:col-span-2 bg-slate-50 border border-slate-100 rounded-2xl p-4">
+            <div class="grid grid-cols-7 text-center text-xs font-extrabold text-slate-400 mb-2">
+              <div class="py-1">DOM</div>
+              <div class="py-1">SEG</div>
+              <div class="py-1">TER</div>
+              <div class="py-1">QUA</div>
+              <div class="py-1">QUI</div>
+              <div class="py-1">SEX</div>
+              <div class="py-1">SÁB</div>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-xs">
+              <!-- Grid cells via JS -->
+            </div>
+          </div>
+
+          <!-- LISTA DE EVENTOS DO MÊS + ADICIONAR -->
+          <div class="space-y-4">
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Novo Compromisso</h3>
+              <div class="space-y-2 text-xs">
+                <input type="text" id="newEventTitle" placeholder="Título (ex: 18H - Aula Saulo)..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                <input type="date" id="newEventDate" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                <textarea id="newEventDesc" rows="2" placeholder="Descrição ou notas adicionais..." class="w-full bg-white border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-rose-300"></textarea>
+                <button onclick="addEvent()" class="w-full py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i> Agendar Evento
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Compromissos do Mês</h3>
+              <div id="eventsList" class="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+                <!-- Items via JS -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -616,6 +680,10 @@
           ]
         }
       ],
+      events: [
+        { id: 1, title: '18H - Aula Saulo', date: '2026-10-18', description: '' },
+        { id: 2, title: '20H - Aula Mari', date: '2026-10-20', description: '' }
+      ],
       finances: [
         { id: 1, title: 'Salário / Prolabore', amount: 5000, type: 'income', month: '2026-10', notes: 'Pagamento mensal principal' },
         { id: 2, title: 'Aluguel & Contas', amount: 1600, type: 'expense', month: '2026-10', notes: 'Transferência automática' },
@@ -626,11 +694,7 @@
 
     let appState = JSON.parse(localStorage.getItem('life_os_data')) || DEFAULT_DATA;
     if (!appState.goals) appState.goals = DEFAULT_DATA.goals;
-    
-    // Estado de expansão/colapso das tarefas concluídas dos projetos
-    let collapsedCompletedProjects = {};
-
-    let selectedMonth = new Date().toISOString().slice(0, 7);
+    if (!appState.events) appState.events = DEFAULT_DATA.events || [];
     let currentWeekOffset = 0;
     let activeTab = 'habits';
 
@@ -683,23 +747,27 @@
       renderHabits();
       renderGoals();
       renderProjects();
+      renderCalendar();
       renderFinances();
       renderAnalytics();
     }
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.pillar-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-    function setupMonthSelector() {
-      const select = document.getElementById('monthSelector');
-      select.innerHTML = '';
-      const today = new Date();
-      for (let i = -6; i <= 6; i++) {
-        const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-        const val = d.toISOString().slice(0, 7);
-        const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-        const opt = document.createElement('option');
-        opt.value = val;
-        opt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
-        if (val === selectedMonth) opt.selected = true;
-        select.appendChild(opt);
+      const targetPillar = document.getElementById(`pillar-${tabId}`);
+      const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+
+      if (targetPillar) targetPillar.classList.remove('hidden');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (tabId === 'goals') {
+        renderGoals();
+      } else if (tabId === 'calendar') {
+        renderCalendar();
+      } else if (tabId === 'analytics') {
+        renderAnalytics();
       }
     }
 
@@ -1176,26 +1244,25 @@
 
     function toggleTaskDone(pId, tId) {
       const project = appState.projects.find(p => p.id === pId);
-      if (project) {
-        const task = project.tasks.find(t => t.id === tId);
-        if (task) {
-          const wasDone = task.done;
-          task.done = !wasDone;
+      if (!project) return;
+      const task = project.tasks.find(t => t.id === tId);
+      if (!task) return;
 
-          if (!wasDone && task.recurrence && task.recurrence !== 'none') {
-            const nextDueDate = calculateNextRecurrenceDate(task.dueDate, task.recurrence);
-            project.tasks.push({
-              id: Date.now(),
-              name: task.name,
-              dueDate: nextDueDate,
-              recurrence: task.recurrence,
-              done: false,
-              pomodoros: 0
-            });
-          }
-          saveData();
-        }
+      task.done = !task.done;
+
+      // Se foi concluída e possui recorrência, gera a próxima tarefa automaticamente
+      if (task.done && task.recurrence && task.recurrence !== 'none') {
+        const nextDate = calculateNextRecurrenceDate(task.dueDate, task.recurrence);
+        project.tasks.push({
+          id: Date.now(),
+          name: task.name,
+          dueDate: nextDate,
+          recurrence: task.recurrence,
+          done: false,
+          pomodoros: 0
+        });
       }
+      saveData();
     }
 
     function deleteTask(pId, tId) {
@@ -1206,78 +1273,179 @@
       }
     }
 
-    // TIMER POMODORO
+    // MÓDULO DE POMODORO
     function startPomodoroForTask(pId, tId, taskName, projName) {
       pomodoroState.pId = pId;
       pomodoroState.tId = tId;
       document.getElementById('pomoTaskTitle').textContent = taskName;
       document.getElementById('pomoProjectTitle').textContent = projName;
       document.getElementById('pomodoroBanner').classList.remove('hidden');
-      resetPomodoroTimer();
     }
 
     function togglePomodoroTimer() {
       const btnText = document.getElementById('pomoStartBtnText');
-      const startBtn = document.getElementById('pomoStartBtn');
-
       if (pomodoroState.active) {
         clearInterval(pomodoroState.timer);
         pomodoroState.active = false;
         btnText.textContent = 'Iniciar';
-        startBtn.classList.replace('bg-amber-500', 'bg-rose-500');
       } else {
         pomodoroState.active = true;
         btnText.textContent = 'Pausar';
-        startBtn.classList.replace('bg-rose-500', 'bg-amber-500');
-        pomodoroState.timer = setInterval(updatePomodoroDisplay, 1000);
+        pomodoroState.timer = setInterval(() => {
+          if (pomodoroState.timeLeft > 0) {
+            pomodoroState.timeLeft--;
+            updatePomodoroDisplay();
+          } else {
+            clearInterval(pomodoroState.timer);
+            pomodoroState.active = false;
+            btnText.textContent = 'Iniciar';
+            pomodoroState.timeLeft = 25 * 60;
+            updatePomodoroDisplay();
+
+            // Incrementa contagem de pomodoros na tarefa selecionada
+            if (pomodoroState.pId && pomodoroState.tId) {
+              const project = appState.projects.find(p => p.id === pomodoroState.pId);
+              if (project) {
+                const task = project.tasks.find(t => t.id === pomodoroState.tId);
+                if (task) {
+                  task.pomodoros = (task.pomodoros || 0) + 1;
+                  saveData();
+                }
+              }
+            }
+          }
+        }, 1000);
       }
-      lucide.createIcons();
     }
 
     function resetPomodoroTimer() {
       clearInterval(pomodoroState.timer);
       pomodoroState.active = false;
       pomodoroState.timeLeft = 25 * 60;
-      updateTimerUI();
       document.getElementById('pomoStartBtnText').textContent = 'Iniciar';
-      document.getElementById('pomoStartBtn').classList.replace('bg-amber-500', 'bg-rose-500');
-      lucide.createIcons();
+      updatePomodoroDisplay();
     }
 
     function updatePomodoroDisplay() {
-      if (pomodoroState.timeLeft > 0) {
-        pomodoroState.timeLeft--;
-        updateTimerUI();
-      } else {
-        clearInterval(pomodoroState.timer);
-        pomodoroState.active = false;
-
-        if (pomodoroState.pId && pomodoroState.tId) {
-          const project = appState.projects.find(p => p.id === pomodoroState.pId);
-          if (project) {
-            const task = project.tasks.find(t => t.id === pomodoroState.tId);
-            if (task) {
-              task.pomodoros = (task.pomodoros || 0) + 1;
-              saveData();
-            }
-          }
-        }
-
-        resetPomodoroTimer();
-        alert('🎉 Sessão de 25 minutos concluída! Faça uma pausa curta de 5 minutos.');
-      }
-    }
-
-    function updateTimerUI() {
-      const mins = Math.floor(pomodoroState.timeLeft / 60);
-      const secs = pomodoroState.timeLeft % 60;
-      document.getElementById('pomoTimerDisplay').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      const mins = Math.floor(pomodoroState.timeLeft / 60).toString().padStart(2, '0');
+      const secs = (pomodoroState.timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById('pomoTimerDisplay').textContent = `${mins}:${secs}`;
     }
 
     function closePomodoroBanner() {
       clearInterval(pomodoroState.timer);
       pomodoroState.active = false;
       document.getElementById('pomodoroBanner').classList.add('hidden');
+    }
+
+    // MÓDULO DE CALENDÁRIO DE EVENTOS
+    function renderCalendar() {
+      const year = parseInt(selectedMonth.slice(0, 4), 10);
+      const monthIdx = parseInt(selectedMonth.slice(5, 7), 10) - 1;
+
+      const dateObj = new Date(year, monthIdx, 1);
+      const monthName = dateObj.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      document.getElementById('calendarMonthTitle').textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+      const firstDayWeekIdx = new Date(year, monthIdx, 1).getDay(); // 0 = Dom
+      const totalDaysMonth = new Date(year, monthIdx + 1, 0).getDate();
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      // Células vazias do mês anterior
+      for (let i = 0; i < firstDayWeekIdx; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'h-24 bg-slate-100/40 rounded-xl border border-slate-100/50';
+        grid.appendChild(emptyCell);
+      }
+
+      // Células dos dias do mês
+      for (let day = 1; day <= totalDaysMonth; day++) {
+        const dayStr = `${year}-${(monthIdx + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const isToday = dayStr === todayStr;
+        const dayEvents = appState.events.filter(e => e.date === dayStr);
+
+        const cell = document.createElement('div');
+        cell.className = `h-24 p-1.5 rounded-xl border transition flex flex-col justify-between overflow-hidden ${isToday ? 'bg-rose-50/60 border-rose-300 ring-2 ring-rose-200' : 'bg-white border-slate-100 hover:border-slate-200'}`;
+
+        let eventsPills = dayEvents.map(e => `
+          <div class="px-1.5 py-0.5 bg-rose-100 text-rose-800 text-[10px] font-bold rounded truncate" title="${e.title}">
+            ${e.title}
+          </div>
+        `).join('');
+
+        cell.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold ${isToday ? 'bg-rose-500 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
+            ${dayEvents.length > 0 ? `<span class="text-[9px] font-bold text-rose-500">${dayEvents.length}</span>` : ''}
+          </div>
+          <div class="space-y-1 overflow-y-auto max-h-16 custom-scrollbar">
+            ${eventsPills}
+          </div>
+        `;
+        grid.appendChild(cell);
+      }
+
+      // Render da lista lateral de compromissos do mês
+      const eventsListContainer = document.getElementById('eventsList');
+      eventsListContainer.innerHTML = '';
+
+      const monthEvents = appState.events
+        .filter(e => e.date && e.date.startsWith(selectedMonth))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      monthEvents.forEach(evt => {
+        const dateFormatted = new Date(evt.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const item = document.createElement('div');
+        item.className = 'p-2.5 bg-white border border-slate-100 rounded-xl text-xs space-y-1 shadow-sm';
+        item.innerHTML = `
+          <div class="flex items-center justify-between font-bold">
+            <span class="text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">${dateFormatted}</span>
+            <button onclick="deleteEvent(${evt.id})" class="text-slate-300 hover:text-rose-500 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          <p class="font-semibold text-slate-800">${evt.title}</p>
+          ${evt.description ? `<p class="text-[11px] text-slate-500 italic">${evt.description}</p>` : ''}
+        `;
+        eventsListContainer.appendChild(item);
+      });
+
+      if (monthEvents.length === 0) {
+        eventsListContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">Nenhum evento neste mês.</p>`;
+      }
+
+      lucide.createIcons();
+    }
+
+    function addEvent() {
+      const titleInput = document.getElementById('newEventTitle');
+      const dateInput = document.getElementById('newEventDate');
+      const descInput = document.getElementById('newEventDesc');
+
+      if (!titleInput.value.trim() || !dateInput.value) return;
+
+      if (!appState.events) appState.events = [];
+
+      appState.events.push({
+        id: Date.now(),
+        title: titleInput.value.trim(),
+        date: dateInput.value,
+        description: descInput.value ? descInput.value.trim() : ''
+      });
+
+      titleInput.value = '';
+      descInput.value = '';
+      saveData();
+    }
+
+    function deleteEvent(id) {
+      if (!appState.events) return;
+      appState.events = appState.events.filter(e => e.id !== id);
+      saveData();
     }
 
     // MÓDULO DE FINANÇAS EXPANDIDO
