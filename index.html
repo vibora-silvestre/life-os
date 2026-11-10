@@ -1,695 +1,1547 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life OS - Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --accent-color: #6366f1;
-            --accent-hover: #4f46e5;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --border-color: #e2e8f0;
-            --radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Life OS - Dashboard Pessoal</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+  <!-- PWA & Mobile Optimization Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Life OS">
+  <meta name="theme-color" content="#FAF8F5">
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            min-height: 100vh;
+  <!-- Tailwind CSS, Lucide Icons & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            pastel: {
+              cream: '#FFFDF9',
+              bg: '#FAF8F5',
+              border: '#F1ECE6',
+              rose: '#FCE7F3',
+              roseDark: '#9D174D',
+              sage: '#DCFCE7',
+              sageDark: '#166534',
+              lavender: '#F3E8FF',
+              lavenderDark: '#6B21A8',
+              sky: '#E0F2FE',
+              skyDark: '#075985',
+              peach: '#FFEDD5',
+              peachDark: '#9A3412',
+              cardBg: '#FFFFFF',
+              textPrimary: '#2D3748',
+              textSecondary: '#718096'
+            }
+          }
         }
-
-        /* Sidebar */
-        sidebar {
-            width: 260px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            position: fixed;
-            height: 100vh;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 32px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-        .nav-links button {
-            width: 100%;
-            background: none;
-            border: none;
-            text-align: left;
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-links button:hover, .nav-links button.active {
-            background-color: #e0e7ff;
-            color: var(--accent-color);
-        }
-
-        /* Main Content */
-        main {
-            margin-left: 260px;
-            flex-grow: 1;
-            padding: 40px;
-            max-width: 1200px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--text-primary);
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-        }
-
-        /* Form elements & buttons */
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            outline: none;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--accent-color);
-        }
-
-        button.btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button.btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        /* Projects & Tasks Specific */
-        .project-card {
-            margin-bottom: 20px;
-        }
-
-        .project-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--accent-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--border-color);
-            gap: 12px;
-        }
-
-        .task-item.done span {
-            text-decoration: line-through;
-            color: var(--text-secondary);
-        }
-
-        .task-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-grow: 1;
-        }
-
-        .task-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-
-        .btn-icon:hover {
-            background-color: #f1f5f9;
-        }
-
-        /* Completed Tasks Accordion */
-        .completed-section-container {
-            margin-top: 12px;
-            border-top: 1px dashed var(--border-color);
-            padding-top: 8px;
-        }
-
-        .toggle-completed-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 0;
-        }
-
-        .toggle-completed-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .completed-tasks-list {
-            margin-top: 8px;
-            padding-left: 8px;
-            border-left: 2px solid var(--border-color);
-        }
-
-        /* Habits table */
-        .habits-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-        }
-
-        .habits-table th, .habits-table td {
-            border: 1px solid var(--border-color);
-            padding: 8px;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        .habits-table th {
-            background-color: #f8fafc;
-        }
-
-        .habit-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        /* Analytics */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: var(--radius);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-top: 8px;
-            color: var(--accent-color);
-        }
-
-        .stat-sub {
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .text-success { color: var(--success-color); font-weight: 600; }
-        .text-danger { color: var(--danger-color); font-weight: 600; }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: var(--radius);
-            width: 400px;
-            max-width: 90%;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    body { 
+      background-color: #FAF8F5; 
+      color: #2D3748; 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pastel-card { background: #FFFFFF; border: 1px solid #F1ECE6; box-shadow: 0 4px 20px -2px rgba(220, 200, 190, 0.12); }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .tab-btn.active {
+      background-color: #FFFFFF;
+      color: #1E293B;
+      box-shadow: 0 2px 8px -1px rgba(0,0,0,0.08);
+      font-weight: 700;
+    }
+    button, input, select { touch-action: manipulation; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen p-4 md:p-8 custom-scrollbar">
 
-    <sidebar>
-        <div class="logo">✨ Life OS</div>
-        <ul class="nav-links">
-            <li><button onclick="switchTab('habits')" id="nav-habits">🌱 Hábitos</button></li>
-            <li><button onclick="switchTab('projects')" id="nav-projects">📋 Projetos & Tarefas</button></li>
-            <li><button onclick="switchTab('finances')" id="nav-finances">💰 Finanças</button></li>
-            <li><button onclick="switchTab('goals')" id="nav-goals">🎯 Metas</button></li>
-            <li><button onclick="switchTab('calendar')" id="nav-calendar">📅 Calendário</button></li>
-            <li><button onclick="switchTab('analytics')" id="nav-analytics">📊 Desempenho & Analytics</button></li>
-        </ul>
-    </sidebar>
-
-    <main>
-        <!-- ABA: HÁBITOS -->
-        <div id="tab-habits" class="tab-content">
-            <h1>Monitor de Hábitos</h1>
-            <div class="card">
-                <div id="habitsContainer"></div>
-            </div>
-        </div>
-
-        <!-- ABA: PROJETOS & TAREFAS -->
-        <div id="tab-projects" class="tab-content">
-            <h1>Projetos & Tarefas</h1>
-            <div class="card">
-                <h3>Adicionar Nova Tarefa</h3>
-                <form id="taskForm" onsubmit="handleAddTask(event)">
-                    <select id="taskProjectSelect" required></select>
-                    <input type="text" id="taskNameInput" placeholder="Nome da atividade..." required>
-                    <input type="date" id="taskDueDateInput">
-                    <label style="font-size: 13px; color: var(--text-secondary);">Recorrência:</label>
-                    <select id="taskRecurrenceInput">
-                        <option value="none">Nenhuma</option>
-                        <option value="daily">Diária</option>
-                        <option value="weekly">Semanal</option>
-                        <option value="monthly">Mensal</option>
-                    </select>
-                    <button type="submit" class="btn">Adicionar Tarefa</button>
-                </form>
-            </div>
-            <div id="projectsContainer"></div>
-        </div>
-
-        <!-- ABA: FINANÇAS -->
-        <div id="tab-finances" class="tab-content">
-            <h1>Controle Financeiro</h1>
-            <div class="card">
-                <div id="financesContainer">Carregando finanças...</div>
-            </div>
-        </div>
-
-        <!-- ABA: METAS -->
-        <div id="tab-goals" class="tab-content">
-            <h1>Metas Anuais</h1>
-            <div class="card">
-                <div id="goalsContainer">Carregando metas...</div>
-            </div>
-        </div>
-
-        <!-- ABA: CALENDÁRIO -->
-        <div id="tab-calendar" class="tab-content">
-            <h1>Calendário & Eventos</h1>
-            <div class="card">
-                <div id="calendarContainer">Carregando eventos...</div>
-            </div>
-        </div>
-
-        <!-- ABA: ANALYTICS -->
-        <div id="tab-analytics" class="tab-content">
-            <h1>Desempenho & Analytics</h1>
-            <div class="analytics-grid">
-                <div class="stat-card">
-                    <h3>Taxa de Conclusão de Hábitos</h3>
-                    <div class="stat-value" id="habitRateValue">0%</div>
-                    <div class="stat-sub" id="habitRateComparison">Calculando comparativo...</div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- MODAL DE EDIÇÃO DE TAREFA -->
-    <div id="editTaskModal" class="modal">
-        <div class="modal-content">
-            <h3>Editar Tarefa</h3>
-            <input type="hidden" id="editProjectId">
-            <input type="hidden" id="editTaskId">
-            <label style="font-size: 13px; margin-top: 8px; display:block;">Nome:</label>
-            <input type="text" id="editTaskName">
-            <label style="font-size: 13px; display:block;">Data Limite:</label>
-            <input type="date" id="editTaskDueDate">
-            <label style="font-size: 13px; display:block;">Recorrência:</label>
-            <select id="editTaskRecurrence">
-                <option value="none">Nenhuma</option>
-                <option value="daily">Diária</option>
-                <option value="weekly">Semanal</option>
-                <option value="monthly">Mensal</option>
-            </select>
-            <div style="display: flex; gap: 10px; margin-top: 16px;">
-                <button class="btn" onclick="saveEditedTask()">Salvar</button>
-                <button class="btn" style="background: var(--text-secondary);" onclick="closeEditModal()">Cancelar</button>
-            </div>
-        </div>
+  <!-- TOP BAR & HEADER -->
+  <header class="max-w-7xl mx-auto mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-800 flex items-center gap-3">
+        <span class="p-2 bg-pink-100 rounded-2xl text-pink-500 inline-flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </span>
+        Life OS
+      </h1>
+      <p class="text-slate-500 text-xs md:text-sm mt-1">Seu centro pessoal de produtividade, hábitos, finanças e foco.</p>
     </div>
 
-    <script>
-        // Estado inicial carregado do seu backup Life OS
-        let appData = JSON.parse(localStorage.getItem('lifeOSData')) || {
-            "habits": [
-                { "id": 1, "name": "Beber 2L de Água", "logs": { "2026-10-18": true, "2026-10-19": true } },
-                { "id": 1792254521420, "name": "Duolingo", "targetDays": 7, "logs": { "2026-11-09": true } },
-                { "id": 1792254550041, "name": "Exercício Físico", "targetDays": 5, "logs": { "2026-11-09": true } }
-            ],
-            "projects": [
-                {
-                    "id": 1792253858237,
-                    "name": "Aulas Inglês",
-                    "tasks": [
-                        { "id": 1793566867512, "name": "Criar aula Saulo", "dueDate": "2026-11-15", "done": false, "pomodoros": 0, "recurrence": "weekly" },
-                        { "id": 1793566861033, "name": "Criar aula Saulo", "dueDate": "2026-11-08", "done": true, "pomodoros": 0, "recurrence": "weekly" }
-                    ]
-                }
-            ],
-            "finances": [],
-            "goals": [],
-            "events": []
+    <!-- CONTROLES SUPERIORES -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="bg-white border border-slate-200 rounded-xl px-3 py-2 flex items-center gap-2 shadow-sm">
+        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+        <span class="text-xs font-semibold text-slate-500">Mês:</span>
+        <select id="monthSelector" onchange="changeMonth(this.value)" class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
+          <!-- Dynamic options -->
+        </select>
+      </div>
+
+      <button onclick="exportData()" class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 transition shadow-sm">
+        <i data-lucide="download" class="w-4 h-4 text-indigo-500"></i> Exportar
+      </button>
+
+      <label class="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-medium flex items-center gap-2 cursor-pointer transition shadow-sm">
+        <i data-lucide="upload" class="w-4 h-4 text-emerald-500"></i> Importar
+        <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+      </label>
+    </div>
+  </header>
+
+  <!-- BANNER DE POMODORO -->
+  <section id="pomodoroBanner" class="max-w-7xl mx-auto mb-6 hidden">
+    <div class="bg-gradient-to-r from-rose-50 via-orange-50 to-pink-50 border border-rose-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xl shadow-inner">
+          🍅
+        </div>
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-500" id="pomoModeLabel">Sessão de Foco Ativa</span>
+          <h3 class="text-base font-bold text-slate-800" id="pomoTaskTitle">Selecione uma tarefa para focar</h3>
+          <p class="text-xs text-slate-500" id="pomoProjectTitle">Projeto associado</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <div class="text-3xl md:text-4xl font-black text-slate-800 tracking-wider font-mono" id="pomoTimerDisplay">
+          25:00
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="pomoStartBtn" onclick="togglePomodoroTimer()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-xs shadow-md transition flex items-center gap-1.5">
+            <i data-lucide="play" class="w-4 h-4"></i> <span id="pomoStartBtnText">Iniciar</span>
+          </button>
+          <button onclick="resetPomodoroTimer()" class="p-2 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-xl text-xs transition" title="Resetar Timer">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+          <button onclick="closePomodoroBanner()" class="p-2 text-slate-400 hover:text-slate-600 text-xs" title="Fechar Pomodoro">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NAVEGAÇÃO DE PILARES -->
+  <div class="max-w-7xl mx-auto mb-8 bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1 overflow-x-auto custom-scrollbar">
+    <button onclick="switchTab('habits')" id="tabBtn-habits" class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> Hábitos
+    </button>
+    <button onclick="switchTab('goals')" id="tabBtn-goals" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="target" class="w-4 h-4 text-amber-500"></i> Metas Anuais
+    </button>
+    <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-500"></i> Projetos & Tarefas
+    </button>
+    <button onclick="switchTab('finances')" id="tabBtn-finances" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="wallet" class="w-4 h-4 text-sky-500"></i> Finanças
+    </button>
+    <button onclick="switchTab('analytics')" id="tabBtn-analytics" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 transition flex items-center gap-2 whitespace-nowrap">
+      <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-500"></i> Desempenho & Analytics
+    </button>
+  </div>
+
+  <main class="max-w-7xl mx-auto">
+
+    <!-- PILAR 1: HÁBITOS (Com Meta Semanal e Progresso) -->
+    <section id="pillar-habits" class="pillar-content space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
+              <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Rastreamento de Hábitos</h2>
+              <p class="text-xs text-slate-500">Semanas iniciando na Segunda-Feira • Metas de consistência semanal</p>
+            </div>
+          </div>
+
+          <!-- NAVEGAÇÃO DE SEMANA -->
+          <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+            <button onclick="changeWeek(-1)" class="p-1 text-slate-600 hover:bg-white hover:shadow-sm rounded-lg transition" title="Semana Anterior">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span class="text-xs font-semibold text-slate-700 px-2" id="currentWeekLabel">Semana Atual</span>
+            <button onclick="changeWeek(1)" class="p-1 text-slate-600 hover:bg-white hover:shadow-sm rounded-lg transition" title="Próxima Semana">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- TABELA DE HÁBITOS -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-xs font-semibold text-slate-400">
+                <th class="py-3 px-2 min-w-[180px]">HÁBITO</th>
+                <th class="py-3 px-2 min-w-[140px]">META SEMANAL</th>
+                <th id="dayHeadersContainer" class="contents">
+                  <!-- Generated by JS -->
+                </th>
+                <th class="py-3 px-2 text-right">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="habitsTableBody" class="divide-y divide-slate-50 text-sm">
+              <!-- Habit Rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ADICIONAR HÁBITO COM META -->
+        <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col md:flex-row items-center gap-3">
+          <input type="text" id="newHabitInput" placeholder="Criar novo hábito (ex: Meditar 10min)..." class="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-300">
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <span class="text-xs text-slate-500 font-medium whitespace-nowrap">Meta Semanal:</span>
+            <select id="newHabitTarget" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 focus:outline-none">
+              <option value="7">7 dias/sem</option>
+              <option value="6">6 dias/sem</option>
+              <option value="5" selected>5 dias/sem</option>
+              <option value="4">4 dias/sem</option>
+              <option value="3">3 dias/sem</option>
+              <option value="2">2 dias/sem</option>
+              <option value="1">1 dia/sem</option>
+            </select>
+            <button onclick="addHabit()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm whitespace-nowrap">
+              <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR NOVO: METAS ANUAIS -->
+    <section id="pillar-goals" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6 space-y-6">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-amber-100 rounded-xl text-amber-700">
+              <i data-lucide="target" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Metas Anuais</h2>
+              <p class="text-xs text-slate-500">Defina e acompanhe suas grandes conquistas e metas do ano</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <select id="annualGoalYearFilter" onchange="renderGoals()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+              <option value="2026" selected>Ano 2026</option>
+              <option value="2027">Ano 2027</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- RESUMO DE PROGRESSO DAS METAS ANUAIS -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="space-y-1 text-center md:text-left">
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-amber-700">Progresso Geral das Metas</span>
+            <h3 id="goalsSummaryTitle" class="text-lg font-bold text-slate-800">0 de 0 metas concluídas</h3>
+            <p class="text-xs text-slate-500">Mantenha a consistência para alcançar seus objetivos anuais.</p>
+          </div>
+
+          <div class="w-full md:w-1/3 space-y-2">
+            <div class="flex items-center justify-between text-xs font-extrabold text-amber-900">
+              <span>Conclusão</span>
+              <span id="goalsProgressPct">0%</span>
+            </div>
+            <div class="w-full bg-amber-200/60 h-3 rounded-full overflow-hidden">
+              <div id="goalsProgressBar" class="h-full bg-amber-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE METAS COM CHECKLIST -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Checklist de Metas Anuais</h3>
+          <div id="goalsList" class="space-y-3">
+            <!-- Items via JS -->
+          </div>
+        </div>
+
+        <!-- FORMULÁRIO DE NOVA META ANUAL -->
+        <div class="pt-4 border-t border-slate-100 flex flex-col md:flex-row items-center gap-3">
+          <input type="text" id="newGoalTitle" placeholder="Nova Meta Anual (ex: Ler 24 livros, Viajar para o Japão)..." class="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-amber-300">
+          <select id="newGoalCategory" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-700 focus:outline-none w-full md:w-auto">
+            <option value="Pessoal">Pessoal</option>
+            <option value="Carreira">Carreira</option>
+            <option value="Finanças">Finanças</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Estudos">Estudos</option>
+          </select>
+          <button onclick="addGoal()" class="w-full md:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap">
+            <i data-lucide="plus" class="w-4 h-4"></i> Adicionar Meta
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 2: PROJETOS & TAREFAS (Com Progresso e Estatísticas de Conclusão) -->
+    <section id="pillar-projects" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-indigo-100 rounded-xl text-indigo-700">
+              <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Projetos & Tarefas</h2>
+              <p class="text-xs text-slate-500">Acompanhamento do progresso de entregas e tarefas</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs font-medium">
+            <span class="px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-3.5 h-3.5"></i> <span id="dueSoonCount">0</span> para hoje
+            </span>
+            <span class="px-3 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> <span id="overdueCount">0</span> em atraso
+            </span>
+          </div>
+        </div>
+
+        <div id="projectsContainer" class="space-y-6">
+          <!-- Projects rendered dynamically -->
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-100 flex items-center gap-2">
+          <input type="text" id="newProjectInput" placeholder="Nome do novo projeto..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <button onclick="addProject()" class="px-5 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="folder-plus" class="w-4 h-4"></i> Criar Projeto
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 3: FINANÇAS (Com PIX, Renda Fixa/Variável e Observação) -->
+    <section id="pillar-finances" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-sky-100 rounded-xl text-sky-700">
+              <i data-lucide="wallet" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-xl text-slate-800">Finanças Mensais</h2>
+              <p class="text-xs text-slate-500" id="financeMonthLabel">Filtro Ativo</p>
+            </div>
+          </div>
+
+          <button onclick="showAddFinanceModal()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Lançamento
+          </button>
+        </div>
+
+        <!-- CARDS DE RESUMO FINANCEIRO AMPLIADOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-8">
+          <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-emerald-700 block mb-1">Entradas</span>
+            <span id="finIncomeTotal" class="text-lg font-extrabold text-emerald-900">R$ 0,00</span>
+          </div>
+          <div class="bg-rose-50/70 border border-rose-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-rose-700 block mb-1">Saídas / A Pagar</span>
+            <span id="finExpenseTotal" class="text-lg font-extrabold text-rose-900">R$ 0,00</span>
+          </div>
+          <div class="bg-amber-50/70 border border-amber-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-amber-700 block mb-1">PIX / Dinheiro</span>
+            <span id="finPixTotal" class="text-lg font-extrabold text-amber-900">R$ 0,00</span>
+          </div>
+          <div class="bg-purple-50/70 border border-purple-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-purple-700 block mb-1">Cartão Crédito</span>
+            <span id="finCardTotal" class="text-lg font-extrabold text-purple-900">R$ 0,00</span>
+          </div>
+          <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-indigo-700 block mb-1">Invest. R. Fixa</span>
+            <span id="finFixedInvTotal" class="text-lg font-extrabold text-indigo-900">R$ 0,00</span>
+          </div>
+          <div class="bg-teal-50/70 border border-teal-100 rounded-2xl p-3.5">
+            <span class="text-[11px] font-semibold text-teal-700 block mb-1">Invest. R. Variável</span>
+            <span id="finVarInvTotal" class="text-lg font-extrabold text-teal-900">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- LISTA DE REGISTROS -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Lançamentos do Mês Selecionado</h3>
+          <div id="financeList" class="space-y-2.5 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Items via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PILAR 4: DESEMPENHO & ANALYTICS -->
+    <section id="pillar-analytics" class="pillar-content hidden space-y-6">
+      <div class="pastel-card rounded-2xl p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2.5 bg-purple-100 rounded-xl text-purple-700">
+            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-xl text-slate-800">Desempenho & Analytics</h2>
+            <p class="text-xs text-slate-500">Acompanhamento e estatísticas de consistência e finanças</p>
+          </div>
+        </div>
+
+        <!-- CARDS DE RESUMO GERAL -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-xs">
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Taxa Conclusão Hábitos:</span>
+            <div class="flex items-baseline gap-2">
+              <span id="habitSuccessRate" class="text-2xl font-extrabold text-emerald-600">0%</span>
+              <span id="habitRateDiff" class="text-xs font-semibold text-slate-500"></span>
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Tarefas Concluídas / Atrasadas:</span>
+            <span id="taskStatusRatio" class="text-xl font-extrabold text-slate-800">0 / 0</span>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <span class="text-slate-500 font-medium block mb-1">Total Ciclos Pomodoro:</span>
+            <span id="totalPomodorosCount" class="text-2xl font-extrabold text-rose-500">🍅 0</span>
+          </div>
+        </div>
+
+  <!-- MODAL: EDITAR TAREFA -->
+  <div id="editTaskModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-base text-slate-800">Editar Tarefa</h3>
+        <button onclick="closeEditTaskModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="editTaskProjId">
+      <input type="hidden" id="editTaskId">
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Nome da Tarefa</label>
+          <input type="text" id="editTaskName" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Data de Vencimento</label>
+            <input type="date" id="editTaskDueDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Recorrência</label>
+            <select id="editTaskRecurrence" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+              <option value="none">Nenhuma</option>
+              <option value="daily">Diária</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensal</option>
+              <option value="yearly">Anual</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeEditTaskModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
+        <button onclick="saveEditedTask()" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO E STORAGE INICIAL
+    const DEFAULT_DATA = {
+      habits: [
+        { id: 1, name: 'Beber 2L de Água', targetDays: 7, logs: {} },
+        { id: 2, name: 'Ler / Estudar 30 min', targetDays: 5, logs: {} },
+        { id: 3, name: 'Atividade Física', targetDays: 4, logs: {} }
+      ],
+      goals: [
+        { id: 1, title: 'Guardar R$ 10.000 na Reserva de Emergência', category: 'Finanças', year: '2026', done: false },
+        { id: 2, title: 'Ler 12 livros de desenvolvimento pessoal', category: 'Estudos', year: '2026', done: true },
+        { id: 3, title: 'Fazer um check-up médico completo', category: 'Saúde', year: '2026', done: false }
+      ],
+      projects: [
+        {
+          id: 1,
+          name: '🎯 Organização Pessoal',
+          tasks: [
+            { id: 101, name: 'Planejar metas do próximo mês', dueDate: '2026-10-25', done: false, pomodoros: 2 },
+            { id: 102, name: 'Organizar caixa de entrada', dueDate: '2026-10-18', done: true, pomodoros: 1 }
+          ]
+        }
+      ],
+      finances: [
+        { id: 1, title: 'Salário / Prolabore', amount: 5000, type: 'income', month: '2026-10', notes: 'Pagamento mensal principal' },
+        { id: 2, title: 'Aluguel & Contas', amount: 1600, type: 'expense', month: '2026-10', notes: 'Transferência automática' },
+        { id: 3, title: 'Aporte CDB 110% CDI', amount: 500, type: 'fixed_inv', month: '2026-10', notes: 'Reserva de emergência' },
+        { id: 4, title: 'Mercado Semanal', amount: 250, type: 'pix', month: '2026-10', notes: 'Compras do mês via PIX' }
+      ]
+    };
+
+    let appState = JSON.parse(localStorage.getItem('life_os_data')) || DEFAULT_DATA;
+    if (!appState.goals) appState.goals = DEFAULT_DATA.goals;
+    
+    // Estado de expansão/colapso das tarefas concluídas dos projetos
+    let collapsedCompletedProjects = {};
+
+    let selectedMonth = new Date().toISOString().slice(0, 7);
+    let currentWeekOffset = 0;
+    let activeTab = 'habits';
+
+    // ESTADO POMODORO
+    let pomodoroState = {
+      active: false,
+      timer: null,
+      timeLeft: 25 * 60,
+      pId: null,
+      tId: null
+    };
+
+    let financeChartInstance = null;
+    let habitsChartInstance = null;
+    let tasksChartInstance = null;
+
+    let habitsAnalyticsTimeframe = 'weekly';
+    let tasksAnalyticsTimeframe = 'weekly';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setupMonthSelector();
+      renderAll();
+    });
+
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.pillar-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetPillar = document.getElementById(`pillar-${tabId}`);
+      const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+
+      if (targetPillar) targetPillar.classList.remove('hidden');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      if (tabId === 'goals') {
+        renderGoals();
+      } else if (tabId === 'analytics') {
+        renderAnalytics();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('life_os_data', JSON.stringify(appState));
+      renderAll();
+    }
+
+    function renderAll() {
+      lucide.createIcons();
+      renderHabits();
+      renderGoals();
+      renderProjects();
+      renderFinances();
+      renderAnalytics();
+    }
+
+    function setupMonthSelector() {
+      const select = document.getElementById('monthSelector');
+      select.innerHTML = '';
+      const today = new Date();
+      for (let i = -6; i <= 6; i++) {
+        const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const val = d.toISOString().slice(0, 7);
+        const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+        if (val === selectedMonth) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    function changeMonth(m) {
+      selectedMonth = m;
+      renderAll();
+    }
+
+    // --- STREAMING_CHUNK:Implementing Habit Progress & Monday-based Week logic... ---
+    // CÁLCULO DE SEMANA COM INÍCIO NA SEGUNDA-FEIRA
+    function getWeekDatesMondayStart(offset = 0) {
+      const curr = new Date();
+      const dayOfWeek = curr.getDay(); // 0 = Dom, 1 = Seg, ...
+      // Distância para a segunda-feira da semana atual
+      const distanceToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek) + (offset * 7);
+      
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(curr.getDate() + distanceToMon + i);
+        dates.push(d.toISOString().slice(0, 10));
+      }
+      return dates;
+    }
+
+    function changeWeek(direction) {
+      currentWeekOffset += direction;
+      renderHabits();
+    }
+
+    function renderHabits() {
+      const dates = getWeekDatesMondayStart(currentWeekOffset);
+      const daysShort = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+      
+      const startDateStr = new Date(dates[0] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const endDateStr = new Date(dates[6] + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      document.getElementById('currentWeekLabel').textContent = `${startDateStr} a ${endDateStr}`;
+
+      const container = document.getElementById('dayHeadersContainer');
+      container.innerHTML = '';
+      
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      dates.forEach((d, idx) => {
+        const dateObj = new Date(d + 'T00:00:00');
+        const isToday = d === todayStr;
+        const th = document.createElement('th');
+        th.className = 'py-3 px-1 text-center min-w-[50px]';
+        th.innerHTML = `
+          <div class="text-[10px] uppercase font-bold ${isToday ? 'text-emerald-600' : 'text-slate-400'}">${daysShort[idx]}</div>
+          <div class="text-xs font-bold mt-0.5 ${isToday ? 'bg-emerald-100 text-emerald-800 rounded-full w-7 h-7 flex items-center justify-center mx-auto' : 'text-slate-700'}">${dateObj.getDate()}</div>
+        `;
+        container.appendChild(th);
+      });
+
+      const tbody = document.getElementById('habitsTableBody');
+      tbody.innerHTML = '';
+
+      appState.habits.forEach(habit => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/60 transition';
+
+        // Calcular progresso na semana ativa
+        let completedCount = 0;
+        dates.forEach(d => {
+          if (habit.logs && habit.logs[d]) completedCount++;
+        });
+
+        const target = habit.targetDays || 7;
+        const pct = Math.min(100, Math.round((completedCount / target) * 100));
+        const isGoalMet = completedCount >= target;
+
+        let daysHtml = dates.map(d => {
+          const checked = habit.logs && habit.logs[d];
+          return `
+            <td class="py-3 px-1 text-center">
+              <button onclick="toggleHabitLog(${habit.id}, '${d}')" class="w-8 h-8 rounded-xl flex items-center justify-center mx-auto transition active:scale-95 ${checked ? 'bg-emerald-400 text-white shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-transparent'}">
+                <i data-lucide="check" class="w-4 h-4"></i>
+              </button>
+            </td>
+          `;
+        }).join('');
+
+        tr.innerHTML = `
+          <td class="py-3 px-2 font-medium text-slate-700">${habit.name}</td>
+          
+          <!-- PROGRESSO E META SEMANAL -->
+          <td class="py-3 px-2">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[11px] font-semibold">
+                <span class="${isGoalMet ? 'text-emerald-600 font-bold' : 'text-slate-600'}">${completedCount}/${target} dias</span>
+                <span class="text-slate-400 text-[10px]">${pct}%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="h-full ${isGoalMet ? 'bg-emerald-500' : 'bg-emerald-300'} transition-all duration-300" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          </td>
+
+          ${daysHtml}
+          
+          <td class="py-3 px-2 text-right">
+            <div class="flex items-center justify-end gap-1">
+              <button onclick="openEditHabitModal(${habit.id})" class="p-1.5 text-slate-400 hover:text-emerald-600 transition" title="Editar hábito">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteHabit(${habit.id})" class="p-1.5 text-slate-300 hover:text-rose-500 transition" title="Excluir hábito">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    // --- STREAMING_CHUNK:Implementing Habit Editing Modal Logic... ---
+    function openEditHabitModal(id) {
+      const habit = appState.habits.find(h => h.id === id);
+      if (!habit) return;
+      document.getElementById('editHabitId').value = habit.id;
+      document.getElementById('editHabitName').value = habit.name;
+      document.getElementById('editHabitTarget').value = habit.targetDays || 7;
+      document.getElementById('editHabitModal').classList.remove('hidden');
+    }
+
+    function closeEditHabitModal() {
+      document.getElementById('editHabitModal').classList.add('hidden');
+    }
+
+    function saveEditedHabit() {
+      const id = parseInt(document.getElementById('editHabitId').value, 10);
+      const newName = document.getElementById('editHabitName').value.trim();
+      const newTarget = parseInt(document.getElementById('editHabitTarget').value, 10);
+
+      if (!newName) return;
+
+      const habit = appState.habits.find(h => h.id === id);
+      if (habit) {
+        habit.name = newName;
+        habit.targetDays = newTarget;
+        saveData();
+      }
+      closeEditHabitModal();
+    }
+
+    // --- STREAMING_CHUNK:Implementing Annual Goals Pillar Logic... ---
+    function renderGoals() {
+      const listContainer = document.getElementById('goalsList');
+      if (!listContainer) return;
+
+      const yearFilter = document.getElementById('annualGoalYearFilter')?.value || '2026';
+      const filteredGoals = appState.goals.filter(g => (g.year || '2026') === yearFilter);
+
+      const totalGoals = filteredGoals.length;
+      const doneGoals = filteredGoals.filter(g => g.done).length;
+      const progressPct = totalGoals > 0 ? Math.round((doneGoals / totalGoals) * 100) : 0;
+
+      document.getElementById('goalsSummaryTitle').textContent = `${doneGoals} de ${totalGoals} metas concluídas`;
+      document.getElementById('goalsProgressPct').textContent = `${progressPct}%`;
+      document.getElementById('goalsProgressBar').style.width = `${progressPct}%`;
+
+      listContainer.innerHTML = '';
+
+      filteredGoals.forEach(goal => {
+        const item = document.createElement('div');
+        item.className = 'p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between gap-3 hover:bg-slate-100/60 transition';
+        item.innerHTML = `
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <input type="checkbox" ${goal.done ? 'checked' : ''} onchange="toggleGoalDone(${goal.id})" class="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-400 cursor-pointer">
+            <span class="text-xs font-semibold ${goal.done ? 'line-through text-slate-400' : 'text-slate-800'} truncate">${goal.title}</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md whitespace-nowrap">${goal.category || 'Geral'}</span>
+          </div>
+          <button onclick="deleteGoal(${goal.id})" class="text-slate-300 hover:text-rose-500 transition">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      if (filteredGoals.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">Nenhuma meta cadastrada para o ano de ${yearFilter}.</p>`;
+      }
+
+      lucide.createIcons();
+    }
+
+    function addGoal() {
+      const titleInput = document.getElementById('newGoalTitle');
+      const categorySelect = document.getElementById('newGoalCategory');
+      const yearFilter = document.getElementById('annualGoalYearFilter').value || '2026';
+
+      if (!titleInput.value.trim()) return;
+
+      appState.goals.push({
+        id: Date.now(),
+        title: titleInput.value.trim(),
+        category: categorySelect.value,
+        year: yearFilter,
+        done: false
+      });
+
+      titleInput.value = '';
+      saveData();
+    }
+
+    function toggleGoalDone(id) {
+      const goal = appState.goals.find(g => g.id === id);
+      if (goal) {
+        goal.done = !goal.done;
+        saveData();
+      }
+    }
+
+    function deleteGoal(id) {
+      appState.goals = appState.goals.filter(g => g.id !== id);
+      saveData();
+    }
+
+    function deleteHabit(id) {
+      appState.habits = appState.habits.filter(h => h.id !== id);
+      saveData();
+    }
+
+    // --- STREAMING_CHUNK:Implementing Project Tasks & Progress calculation... ---
+    // PROJETOS, TAREFAS E CONTADORES
+    function renderProjects() {
+      const container = document.getElementById('projectsContainer');
+      container.innerHTML = '';
+
+      let dueSoonTotal = 0;
+      let overdueTotal = 0;
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      appState.projects.forEach(project => {
+        const projEl = document.createElement('div');
+        projEl.className = 'bg-slate-50/70 border border-slate-100 rounded-2xl p-4 space-y-4';
+
+        const totalTasks = project.tasks.length;
+        const openTasksList = project.tasks.filter(t => !t.done);
+        const completedTasksList = project.tasks.filter(t => t.done);
+
+        const completedCount = completedTasksList.length;
+        const openCount = openTasksList.length;
+        const progressPct = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+
+        const renderTaskRow = (t) => {
+          const isOverdue = t.dueDate && t.dueDate < todayStr && !t.done;
+          const isDueSoon = t.dueDate && t.dueDate === todayStr && !t.done;
+
+          if (isOverdue) overdueTotal++;
+          if (isDueSoon) dueSoonTotal++;
+
+          const recLabels = { daily: 'Diária', weekly: 'Semanal', monthly: 'Mensal', yearly: 'Anual' };
+          const recBadge = t.recurrence && t.recurrence !== 'none' 
+            ? `<span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-md inline-flex items-center gap-1"><i data-lucide="repeat" class="w-3 h-3"></i> ${recLabels[t.recurrence] || t.recurrence}</span>` 
+            : '';
+
+          return `
+            <div class="flex items-center justify-between gap-2 p-3 bg-white border border-slate-100 rounded-xl hover:shadow-sm transition">
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone(${project.id}, ${t.id})" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-400 cursor-pointer">
+                <span class="text-xs font-medium ${t.done ? 'line-through text-slate-400' : 'text-slate-700'} truncate">${t.name}</span>
+                ${recBadge}
+                ${t.pomodoros ? `<span class="text-[10px] font-bold px-2 py-0.5 bg-rose-50 text-rose-600 border border-rose-100 rounded-md inline-flex items-center gap-1">🍅 x${t.pomodoros}</span>` : ''}
+              </div>
+
+              <div class="flex items-center gap-2">
+                ${t.dueDate ? `
+                  <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md ${isOverdue ? 'bg-rose-100 text-rose-700' : isDueSoon ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}">
+                    ${new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                ` : ''}
+
+                <button onclick="startPomodoroForTask(${project.id}, ${t.id}, '${t.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${project.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="p-1 text-slate-400 hover:text-rose-500 transition" title="Iniciar Pomodoro nesta tarefa">
+                  <i data-lucide="timer" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="openEditTaskModal(${project.id}, ${t.id})" class="p-1 text-slate-400 hover:text-indigo-600 transition" title="Editar tarefa">
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="deleteTask(${project.id}, ${t.id})" class="p-1 text-slate-300 hover:text-rose-500 transition" title="Excluir tarefa">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          `;
         };
 
-        function saveData() {
-            localStorage.setItem('lifeOSData', JSON.stringify(appData));
-        }
+        const openTasksHtml = openTasksList.map(renderTaskRow).join('');
+        const completedTasksHtml = completedTasksList.map(renderTaskRow).join('');
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-links button').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
-            
-            if (tabId === 'projects') renderProjects();
-            if (tabId === 'habits') renderHabits();
-            if (tabId === 'analytics') renderAnalytics();
-            if (tabId === 'finances') renderFinances();
-            if (tabId === 'goals') renderGoals();
-            if (tabId === 'calendar') renderCalendar();
-        }
+        const isExpanded = collapsedCompletedProjects[project.id] === true;
 
-        // --- RENDER HÁBITOS ---
-        function renderHabits() {
-            const container = document.getElementById('habitsContainer');
-            let html = `<table class="habits-table"><tr><th>Hábito</th><th>Meta/sem</th></tr>`;
-            appData.habits.forEach(h => {
-                html += `<tr><td style="text-align:left; font-weight:500;">${h.name}</td><td>${h.targetDays || 7}x</td></tr>`;
+        projEl.innerHTML = `
+          <!-- CABEÇALHO DO PROJETO COM PROGRESSO -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-800">${project.name}</h3>
+              <button onclick="deleteProject(${project.id})" class="text-xs text-slate-300 hover:text-rose-500 transition">Excluir Projeto</button>
+            </div>
+
+            <!-- ESTATÍSTICAS E BARRA DE PROGRESSO -->
+            <div class="flex items-center justify-between text-xs text-slate-500">
+              <span class="font-medium">${completedCount} concluídas • <strong class="text-indigo-600">${openCount} em aberto</strong> (Total: ${totalTasks})</span>
+              <span class="font-extrabold text-slate-700">${progressPct}%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-500 transition-all duration-300" style="width: ${progressPct}%"></div>
+            </div>
+          </div>
+
+          <!-- LISTA DE TAREFAS EM ABERTO -->
+          <div class="space-y-2 pt-2">
+            ${openTasksHtml || (completedCount === 0 ? '<p class="text-xs text-slate-400 italic">Nenhuma tarefa registrada neste projeto.</p>' : '<p class="text-xs text-emerald-600 font-semibold italic">🎉 Todas as tarefas deste projeto foram concluídas!</p>')}
+          </div>
+
+          <!-- BLOCO DE TAREFAS CONCLUÍDAS (SANFONA / COLLAPSIBLE) -->
+          ${completedCount > 0 ? `
+            <div class="pt-2 border-t border-slate-200/60">
+              <button onclick="toggleCompletedTasksSection(${project.id})" class="flex items-center justify-between w-full py-1.5 px-3 bg-slate-100 hover:bg-slate-200/70 rounded-xl text-xs font-semibold text-slate-600 transition">
+                <span class="flex items-center gap-1.5">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
+                  Atividades Concluídas (${completedCount})
+                </span>
+                <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 text-slate-400"></i>
+              </button>
+
+              <div class="space-y-2 mt-2 ${isExpanded ? '' : 'hidden'}">
+                ${completedTasksHtml}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- CRIAR TAREFA -->
+          <div class="flex items-center gap-2 pt-2">
+            <input type="text" id="newTaskInput-${project.id}" placeholder="Nova tarefa..." class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none">
+            <input type="date" id="newTaskDate-${project.id}" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none">
+            <select id="newTaskRecurrence-${project.id}" class="bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-slate-600 focus:outline-none">
+              <option value="none">Sem recorrência</option>
+              <option value="daily">Diária</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensal</option>
+              <option value="yearly">Anual</option>
+            </select>
+            <button onclick="addTask(${project.id})" class="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition whitespace-nowrap">Adicionar</button>
+          </div>
+        `;
+
+        container.appendChild(projEl);
+      });
+
+      document.getElementById('dueSoonCount').textContent = dueSoonTotal;
+      document.getElementById('overdueCount').textContent = overdueTotal;
+      lucide.createIcons();
+    }
+
+    function toggleCompletedTasksSection(pId) {
+      collapsedCompletedProjects[pId] = !collapsedCompletedProjects[pId];
+      renderProjects();
+    }
+
+    function addTask(pId) {
+      const titleInput = document.getElementById(`newTaskInput-${pId}`);
+      const dateInput = document.getElementById(`newTaskDate-${pId}`);
+      const recurrenceSelect = document.getElementById(`newTaskRecurrence-${pId}`);
+      if (!titleInput.value.trim()) return;
+
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        project.tasks.push({
+          id: Date.now(),
+          name: titleInput.value.trim(),
+          dueDate: dateInput.value || null,
+          recurrence: recurrenceSelect ? recurrenceSelect.value : 'none',
+          done: false,
+          pomodoros: 0
+        });
+        saveData();
+      }
+    }
+
+    function openEditTaskModal(pId, tId) {
+      const project = appState.projects.find(p => p.id === pId);
+      if (!project) return;
+      const task = project.tasks.find(t => t.id === tId);
+      if (!task) return;
+
+      document.getElementById('editTaskProjId').value = pId;
+      document.getElementById('editTaskId').value = tId;
+      document.getElementById('editTaskName').value = task.name;
+      document.getElementById('editTaskDueDate').value = task.dueDate || '';
+      document.getElementById('editTaskRecurrence').value = task.recurrence || 'none';
+
+      document.getElementById('editTaskModal').classList.remove('hidden');
+    }
+
+    function closeEditTaskModal() {
+      document.getElementById('editTaskModal').classList.add('hidden');
+    }
+
+    function saveEditedTask() {
+      const pId = parseInt(document.getElementById('editTaskProjId').value, 10);
+      const tId = parseInt(document.getElementById('editTaskId').value, 10);
+      const name = document.getElementById('editTaskName').value.trim();
+      const dueDate = document.getElementById('editTaskDueDate').value;
+      const recurrence = document.getElementById('editTaskRecurrence').value;
+
+      if (!name) return;
+
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        const task = project.tasks.find(t => t.id === tId);
+        if (task) {
+          task.name = name;
+          task.dueDate = dueDate || null;
+          task.recurrence = recurrence;
+          saveData();
+        }
+      }
+      closeEditTaskModal();
+    }
+
+    function calculateNextRecurrenceDate(currentDateStr, recurrence) {
+      const baseDate = currentDateStr ? new Date(currentDateStr + 'T00:00:00') : new Date();
+      if (recurrence === 'daily') {
+        baseDate.setDate(baseDate.getDate() + 1);
+      } else if (recurrence === 'weekly') {
+        baseDate.setDate(baseDate.getDate() + 7);
+      } else if (recurrence === 'monthly') {
+        baseDate.setMonth(baseDate.getMonth() + 1);
+      } else if (recurrence === 'yearly') {
+        baseDate.setFullYear(baseDate.getFullYear() + 1);
+      }
+      return baseDate.toISOString().slice(0, 10);
+    }
+
+    function toggleTaskDone(pId, tId) {
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        const task = project.tasks.find(t => t.id === tId);
+        if (task) {
+          const wasDone = task.done;
+          task.done = !wasDone;
+
+          // Se a tarefa acabou de ser concluída e tem recorrência, gera a próxima ocorrência
+          if (!wasDone && task.recurrence && task.recurrence !== 'none') {
+            const nextDueDate = calculateNextRecurrenceDate(task.dueDate, task.recurrence);
+            project.tasks.push({
+              id: Date.now(),
+              name: task.name,
+              dueDate: nextDueDate,
+              recurrence: task.recurrence,
+              done: false,
+              pomodoros: 0
             });
-            html += `</table>`;
-            container.innerHTML = html;
+          }
+          saveData();
+        }
+      }
+    }
+
+    function deleteTask(pId, tId) {
+      const project = appState.projects.find(p => p.id === pId);
+      if (project) {
+        project.tasks = project.tasks.filter(t => t.id !== tId);
+        saveData();
+      }
+    }
+
+    // TIMER POMODORO
+    function startPomodoroForTask(pId, tId, taskName, projName) {
+      pomodoroState.pId = pId;
+      pomodoroState.tId = tId;
+      document.getElementById('pomoTaskTitle').textContent = taskName;
+      document.getElementById('pomoProjectTitle').textContent = projName;
+      document.getElementById('pomodoroBanner').classList.remove('hidden');
+      resetPomodoroTimer();
+    }
+
+    function togglePomodoroTimer() {
+      const btnText = document.getElementById('pomoStartBtnText');
+      const startBtn = document.getElementById('pomoStartBtn');
+
+      if (pomodoroState.active) {
+        clearInterval(pomodoroState.timer);
+        pomodoroState.active = false;
+        btnText.textContent = 'Iniciar';
+        startBtn.classList.replace('bg-amber-500', 'bg-rose-500');
+      } else {
+        pomodoroState.active = true;
+        btnText.textContent = 'Pausar';
+        startBtn.classList.replace('bg-rose-500', 'bg-amber-500');
+        pomodoroState.timer = setInterval(updatePomodoroDisplay, 1000);
+      }
+      lucide.createIcons();
+    }
+
+    function resetPomodoroTimer() {
+      clearInterval(pomodoroState.timer);
+      pomodoroState.active = false;
+      pomodoroState.timeLeft = 25 * 60;
+      updateTimerUI();
+      document.getElementById('pomoStartBtnText').textContent = 'Iniciar';
+      document.getElementById('pomoStartBtn').classList.replace('bg-amber-500', 'bg-rose-500');
+      lucide.createIcons();
+    }
+
+    function updatePomodoroDisplay() {
+      if (pomodoroState.timeLeft > 0) {
+        pomodoroState.timeLeft--;
+        updateTimerUI();
+      } else {
+        clearInterval(pomodoroState.timer);
+        pomodoroState.active = false;
+
+        if (pomodoroState.pId && pomodoroState.tId) {
+          const project = appState.projects.find(p => p.id === pomodoroState.pId);
+          if (project) {
+            const task = project.tasks.find(t => t.id === pomodoroState.tId);
+            if (task) {
+              task.pomodoros = (task.pomodoros || 0) + 1;
+              saveData();
+            }
+          }
         }
 
-        // --- RENDER PROJETOS & TAREFAS ---
-        function renderProjects() {
-            const container = document.getElementById('projectsContainer');
-            const select = document.getElementById('taskProjectSelect');
-            
-            select.innerHTML = '';
-            appData.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+        resetPomodoroTimer();
+        alert('🎉 Sessão de 25 minutos concluída! Faça uma pausa curta de 5 minutos.');
+      }
+    }
+
+    function updateTimerUI() {
+      const mins = Math.floor(pomodoroState.timeLeft / 60);
+      const secs = pomodoroState.timeLeft % 60;
+      document.getElementById('pomoTimerDisplay').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function closePomodoroBanner() {
+      clearInterval(pomodoroState.timer);
+      pomodoroState.active = false;
+      document.getElementById('pomodoroBanner').classList.add('hidden');
+    }
+
+    // --- STREAMING_CHUNK:Implementing Extended Finances & Investment Logic... ---
+    // MÓDULO DE FINANÇAS EXPANDIDO
+    function renderFinances() {
+      document.getElementById('financeMonthLabel').textContent = `Mês selecionado: ${selectedMonth}`;
+      const filtered = appState.finances.filter(f => f.month === selectedMonth);
+
+      let income = 0, expense = 0, pix = 0, card = 0, fixedInv = 0, varInv = 0;
+      const listContainer = document.getElementById('financeList');
+      listContainer.innerHTML = '';
+
+      filtered.forEach(f => {
+        const val = Number(f.amount) || 0;
+        if (f.type === 'income') income += val;
+        if (f.type === 'expense') expense += val;
+        if (f.type === 'pix') pix += val;
+        if (f.type === 'card') card += val;
+        if (f.type === 'fixed_inv') fixedInv += val;
+        if (f.type === 'var_inv') varInv += val;
+
+        // Definir badges e estilos para as diferentes categorias
+        let typeBadgeHtml = '';
+        if (f.type === 'income') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Entrada</span>`;
+        else if (f.type === 'expense') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800">Saída</span>`;
+        else if (f.type === 'pix') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800">PIX/Dinheiro</span>`;
+        else if (f.type === 'card') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 text-purple-800">Cartão</span>`;
+        else if (f.type === 'fixed_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-800">Renda Fixa</span>`;
+        else if (f.type === 'var_inv') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800">Renda Variável</span>`;
+
+        const item = document.createElement('div');
+        item.className = 'p-3 bg-slate-50 rounded-xl text-xs border border-slate-100 space-y-1.5';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              ${typeBadgeHtml}
+              <span class="font-bold text-slate-800">${f.title}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-extrabold text-slate-800">R$ ${val.toFixed(2)}</span>
+              <button onclick="deleteFinance(${f.id})" class="text-slate-300 hover:text-rose-500 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          ${f.notes ? `<p class="text-[11px] text-slate-500 bg-white/70 p-2 rounded-lg border border-slate-100 italic">💬 ${f.notes}</p>` : ''}
+        `;
+        listContainer.appendChild(item);
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">Nenhum lançamento no mês selecionado.</p>`;
+      }
+
+      document.getElementById('finIncomeTotal').textContent = `R$ ${income.toFixed(2)}`;
+      document.getElementById('finExpenseTotal').textContent = `R$ ${expense.toFixed(2)}`;
+      document.getElementById('finPixTotal').textContent = `R$ ${pix.toFixed(2)}`;
+      document.getElementById('finCardTotal').textContent = `R$ ${card.toFixed(2)}`;
+      document.getElementById('finFixedInvTotal').textContent = `R$ ${fixedInv.toFixed(2)}`;
+      document.getElementById('finVarInvTotal').textContent = `R$ ${varInv.toFixed(2)}`;
+
+      lucide.createIcons();
+    }
+
+    function showAddFinanceModal() {
+      document.getElementById('finMonthVal').value = selectedMonth;
+      document.getElementById('financeModal').classList.remove('hidden');
+    }
+
+    function closeFinanceModal() {
+      document.getElementById('financeModal').classList.add('hidden');
+    }
+
+    function saveFinanceEntry() {
+      const title = document.getElementById('finTitle').value;
+      const amount = document.getElementById('finAmount').value;
+      const type = document.getElementById('finType').value;
+      const month = document.getElementById('finMonthVal').value;
+      const notes = document.getElementById('finNotes').value;
+
+      if (!title || !amount) return;
+
+      appState.finances.push({
+        id: Date.now(),
+        title,
+        amount: parseFloat(amount),
+        type,
+        month,
+        notes: notes ? notes.trim() : ''
+      });
+
+      closeFinanceModal();
+      document.getElementById('finTitle').value = '';
+      document.getElementById('finAmount').value = '';
+      document.getElementById('finNotes').value = '';
+      saveData();
+    }
+
+    function deleteFinance(id) {
+      appState.finances = appState.finances.filter(f => f.id !== id);
+      saveData();
+    }
+
+    // ANALYTICS DE DESEMPENHO
+    function renderAnalytics() {
+      // Cálculo da taxa da semana atual vs. semana anterior
+      const currentWeekDates = getWeekDatesMondayStart(currentWeekOffset);
+      const prevWeekDates = getWeekDatesMondayStart(currentWeekOffset - 1);
+
+      let currentWeekTarget = 0, currentWeekDone = 0;
+      let prevWeekTarget = 0, prevWeekDone = 0;
+
+      appState.habits.forEach(h => {
+        const target = h.targetDays || 7;
+        currentWeekTarget += target;
+        prevWeekTarget += target;
+
+        currentWeekDates.forEach(d => {
+          if (h.logs && h.logs[d]) currentWeekDone++;
+        });
+
+        prevWeekDates.forEach(d => {
+          if (h.logs && h.logs[d]) prevWeekDone++;
+        });
+      });
+
+      const currentRate = currentWeekTarget > 0 ? Math.round((currentWeekDone / currentWeekTarget) * 100) : 0;
+      const prevRate = prevWeekTarget > 0 ? Math.round((prevWeekDone / prevWeekTarget) * 100) : 0;
+      const diff = currentRate - prevRate;
+
+      document.getElementById('habitSuccessRate').textContent = `${currentRate}%`;
+      const diffEl = document.getElementById('habitRateDiff');
+      if (diffEl) {
+        const sign = diff >= 0 ? '+' : '';
+        const colorClass = diff >= 0 ? 'text-emerald-600' : 'text-rose-500';
+        diffEl.className = `text-xs font-semibold ${colorClass}`;
+        diffEl.textContent = `${sign}${diff}% vs. sem. anterior`;
+      }
+
+      let completedTasks = 0;
+      let overdueTasks = 0;
+      let totalPomodoros = 0;
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      appState.projects.forEach(p => {
+        p.tasks.forEach(t => {
+          if (t.done) completedTasks++;
+          if (t.dueDate && t.dueDate < todayStr && !t.done) overdueTasks++;
+          totalPomodoros += (t.pomodoros || 0);
+        });
+      });
+
+      document.getElementById('taskStatusRatio').textContent = `${completedTasks} concluídas / ${overdueTasks} atrasadas`;
+      document.getElementById('totalPomodorosCount').textContent = `🍅 ${totalPomodoros} ciclos`;
+
+      renderHabitsAnalyticsChart();
+      renderTasksAnalyticsChart();
+      renderFinanceChart();
+    }
+
+    function setAnalyticsHabitsTimeframe(tf) {
+      habitsAnalyticsTimeframe = tf;
+      const btnW = document.getElementById('btnHabitsWeekly');
+      const btnM = document.getElementById('btnHabitsMonthly');
+      if (tf === 'weekly') {
+        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm';
+        btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+      } else {
+        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm';
+        btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+      }
+      renderHabitsAnalyticsChart();
+    }
+
+    function setAnalyticsTasksTimeframe(tf) {
+      tasksAnalyticsTimeframe = tf;
+      const btnW = document.getElementById('btnTasksWeekly');
+      const btnM = document.getElementById('btnTasksMonthly');
+      if (tf === 'weekly') {
+        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm';
+        btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+      } else {
+        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm';
+        btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
+      }
+      renderTasksAnalyticsChart();
+    }
+
+    function renderHabitsAnalyticsChart() {
+      const canvas = document.getElementById('habitsAnalyticsChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const habitLabels = appState.habits.map(h => h.name);
+      const targetData = [];
+      const actualData = [];
+
+      if (habitsAnalyticsTimeframe === 'weekly') {
+        const dates = getWeekDatesMondayStart(currentWeekOffset);
+        appState.habits.forEach(h => {
+          targetData.push(h.targetDays || 7);
+          let count = 0;
+          dates.forEach(d => {
+            if (h.logs && h.logs[d]) count++;
+          });
+          actualData.push(count);
+        });
+      } else {
+        // Mensal: calcula com base no mês selecionado
+        appState.habits.forEach(h => {
+          const targetMonthly = (h.targetDays || 5) * 4; // Aproximação de 4 semanas
+          targetData.push(targetMonthly);
+          let count = 0;
+          if (h.logs) {
+            Object.keys(h.logs).forEach(dateStr => {
+              if (dateStr.startsWith(selectedMonth) && h.logs[dateStr]) {
+                count++;
+              }
             });
+          }
+          actualData.push(count);
+        });
+      }
 
-            let html = '';
-            appData.projects.forEach(p => {
-                const openTasks = p.tasks.filter(t => !t.done);
-                const completedTasks = p.tasks.filter(t => t.done);
+      if (habitsChartInstance) habitsChartInstance.destroy();
 
-                html += `
-                    <div class="card project-card">
-                        <div class="project-title">${p.name}</div>
-                        <div class="task-list">
-                `;
-
-                if (openTasks.length === 0) {
-                    html += `<p style="font-size:13px; color:var(--text-secondary); padding: 8px 0;">Nenhuma atividade em aberto 🎉</p>`;
-                } else {
-                    openTasks.forEach(t => {
-                        html += renderTaskItem(p.id, t);
-                    });
-                }
-
-                html += `</div>`;
-
-                // Bloco contraído de concluídas
-                if (completedTasks.length > 0) {
-                    html += `
-                        <div class="completed-section-container">
-                            <button class="toggle-completed-btn" onclick="toggleCompleted(${p.id})">
-                                <span id="arrow-${p.id}">▶</span> Atividades Concluídas (${completedTasks.length})
-                            </button>
-                            <div id="completed-box-${p.id}" class="completed-tasks-list" style="display: none;">
-                    `;
-                    completedTasks.forEach(t => {
-                        html += renderTaskItem(p.id, t);
-                    });
-                    html += `</div></div>`;
-                }
-
-                html += `</div>`;
-            });
-
-            container.innerHTML = html;
+      habitsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: habitLabels.length ? habitLabels : ['Nenhum hábito'],
+          datasets: [
+            {
+              label: 'Realizado',
+              data: actualData,
+              backgroundColor: '#10B981',
+              borderRadius: 6
+            },
+            {
+              label: 'Meta',
+              data: targetData,
+              backgroundColor: '#E2E8F0',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
+          scales: {
+            y: { beginAtZero: true, grid: { display: false } },
+            x: { grid: { display: false } }
+          }
         }
+      });
+    }
 
-        function renderTaskItem(projectId, t) {
-            const recLabel = t.recurrence && t.recurrence !== 'none' ? ` <small style="color:var(--accent-color)">[🔄 ${t.recurrence}]</small>` : '';
-            return `
-                <div class="task-item ${t.done ? 'done' : ''}">
-                    <div class="task-left">
-                        <input type="checkbox" class="habit-checkbox" ${t.done ? 'checked' : ''} onclick="toggleTask(${projectId}, ${t.id})">
-                        <span>${t.name} ${t.dueDate ? '(' + t.dueDate + ')' : ''}${recLabel}</span>
-                    </div>
-                    <div class="task-actions">
-                        <button class="btn-icon" title="Cronômetro / Pomodoro">⏱️</button>
-                        <button class="btn-icon" onclick="openEditModal(${projectId}, ${t.id})" title="Editar Tarefa">✏️</button>
-                    </div>
-                </div>
-            `;
+    function renderTasksAnalyticsChart() {
+      const canvas = document.getElementById('tasksAnalyticsChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let doneCount = 0;
+      let pendingCount = 0;
+      let overdueCount = 0;
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      if (tasksAnalyticsTimeframe === 'weekly') {
+        const weekDates = getWeekDatesMondayStart(currentWeekOffset);
+        const weekStart = weekDates[0];
+        const weekEnd = weekDates[6];
+
+        appState.projects.forEach(p => {
+          p.tasks.forEach(t => {
+            if (t.dueDate && t.dueDate >= weekStart && t.dueDate <= weekEnd) {
+              if (t.done) doneCount++;
+              else if (t.dueDate < todayStr) overdueCount++;
+              else pendingCount++;
+            } else if (!t.dueDate) {
+              if (t.done) doneCount++;
+              else pendingCount++;
+            }
+          });
+        });
+      } else {
+        // Mensal
+        appState.projects.forEach(p => {
+          p.tasks.forEach(t => {
+            if (t.dueDate && t.dueDate.startsWith(selectedMonth)) {
+              if (t.done) doneCount++;
+              else if (t.dueDate < todayStr) overdueCount++;
+              else pendingCount++;
+            } else if (!t.dueDate) {
+              if (t.done) doneCount++;
+              else pendingCount++;
+            }
+          });
+        });
+      }
+
+      if (tasksChartInstance) tasksChartInstance.destroy();
+
+      tasksChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Concluídas', 'Em Aberto', 'Atrasadas'],
+          datasets: [{
+            data: [doneCount, pendingCount, overdueCount],
+            backgroundColor: ['#6366F1', '#F59E0B', '#EF4444'],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
         }
+      });
+    }
 
-        function toggleCompleted(projectId) {
-            const box = document.getElementById(`completed-box-${projectId}`);
-            const arrow = document.getElementById(`arrow-${projectId}`);
-            if (box.style.display === 'none') {
-                box.style.display = 'block';
-                arrow.textContent = '▼';
+    function renderFinanceChart() {
+      const canvas = document.getElementById('financeChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const currentYear = selectedMonth ? selectedMonth.slice(0, 4) : new Date().getFullYear().toString();
+      document.getElementById('analyticsFinanceMonthBadge').textContent = `Ano: ${currentYear}`;
+
+      const monthsShort = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const monthlyIncome = new Array(12).fill(0);
+      const monthlyExpenses = new Array(12).fill(0);
+      const monthlyInvestments = new Array(12).fill(0);
+
+      // Agrupa os registros financeiros pelos 12 meses do ano ativo
+      appState.finances.forEach(f => {
+        if (f.month && f.month.startsWith(currentYear)) {
+          const mIdx = parseInt(f.month.slice(5, 7), 10) - 1;
+          if (mIdx >= 0 && mIdx < 12) {
+            const val = Number(f.amount) || 0;
+            if (f.type === 'income') {
+              monthlyIncome[mIdx] += val;
+            } else if (f.type === 'fixed_inv' || f.type === 'var_inv') {
+              monthlyInvestments[mIdx] += val;
             } else {
-                box.style.display = 'none';
-                arrow.textContent = '▶';
+              monthlyExpenses[mIdx] += val;
             }
+          }
         }
+      });
 
-        function toggleTask(projectId, taskId) {
-            const proj = appData.projects.find(p => p.id === projectId);
-            if (!proj) return;
-            const task = proj.tasks.find(t => t.id === taskId);
-            if (!task) return;
+      if (financeChartInstance) financeChartInstance.destroy();
 
-            task.done = !task.done;
-
-            // Lógica de Recorrência Inteligente ao concluir
-            if (task.done && task.recurrence && task.recurrence !== 'none' && task.dueDate) {
-                let nextDate = new Date(task.dueDate);
-                if (task.recurrence === 'daily') nextDate.setDate(nextDate.getDate() + 1);
-                else if (task.recurrence === 'weekly') nextDate.setDate(nextDate.getDate() + 7);
-                else if (task.recurrence === 'monthly') nextDate.setMonth(nextDate.getMonth() + 1);
-
-                const nextDateStr = nextDate.toISOString().split('T')[0];
-                
-                // Cria nova ocorrência em aberto
-                proj.tasks.push({
-                    id: Date.now(),
-                    name: task.name,
-                    dueDate: nextDateStr,
-                    done: false,
-                    pomodoros: 0,
-                    recurrence: task.recurrence
-                });
+      financeChartInstance = new Chart(ctx, {
+        data: {
+          labels: monthsShort,
+          datasets: [
+            {
+              type: 'line',
+              label: 'Entradas / Ganhos',
+              data: monthlyIncome,
+              borderColor: '#059669',
+              backgroundColor: '#10B981',
+              tension: 0.3,
+              borderWidth: 2.5,
+              pointRadius: 4,
+              order: 1
+            },
+            {
+              type: 'line',
+              label: 'Investimentos',
+              data: monthlyInvestments,
+              borderColor: '#4338CA',
+              backgroundColor: '#6366F1',
+              tension: 0.3,
+              borderWidth: 2.5,
+              pointRadius: 4,
+              order: 2
+            },
+            {
+              type: 'bar',
+              label: 'Gastos Totais',
+              data: monthlyExpenses,
+              backgroundColor: 'rgba(244, 63, 94, 0.4)',
+              borderColor: '#F43F5E',
+              borderWidth: 1,
+              borderRadius: 6,
+              order: 3
             }
-
-            saveData();
-            renderProjects();
-        }
-
-        function handleAddTask(event) {
-            event.preventDefault();
-            const projectId = Number(document.getElementById('taskProjectSelect').value);
-            const name = document.getElementById('taskNameInput').value;
-            const dueDate = document.getElementById('taskDueDateInput').value;
-            const recurrence = document.getElementById('taskRecurrenceInput').value;
-
-            const proj = appData.projects.find(p => p.id === projectId);
-            if (proj) {
-                proj.tasks.push({
-                    id: Date.now(),
-                    name,
-                    dueDate: dueDate || null,
-                    done: false,
-                    pomodoros: 0,
-                    recurrence
-                });
-                saveData();
-                document.getElementById('taskNameInput').value = '';
-                document.getElementById('taskDueDateInput').value = '';
-                renderProjects();
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { boxWidth: 12, font: { size: 11 } }
             }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+            x: { grid: { display: false } }
+          }
         }
+      });
+    }
 
-        // --- MODAL DE EDIÇÃO ---
-        function openEditModal(projectId, taskId) {
-            const proj = appData.projects.find(p => p.id === projectId);
-            const task = proj.tasks.find(t => t.id === taskId);
-            
-            document.getElementById('editProjectId').value = projectId;
-            document.getElementById('editTaskId').value = taskId;
-            document.getElementById('editTaskName').value = task.name;
-            document.getElementById('editTaskDueDate').value = task.dueDate || '';
-            document.getElementById('editTaskRecurrence').value = task.recurrence || 'none';
-            
-            document.getElementById('editTaskModal').style.display = 'flex';
+    // EXPORTAR E IMPORTAR
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `life-os-backup-${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appState = JSON.parse(e.target.result);
+          saveData();
+          alert('Dados do Life OS importados com sucesso!');
+        } catch (err) {
+          alert('Formato de arquivo inválido.');
         }
-
-        function closeEditModal() {
-            document.getElementById('editTaskModal').style.display = 'none';
-        }
-
-        function saveEditedTask() {
-            const projectId = Number(document.getElementById('editProjectId').value);
-            const taskId = Number(document.getElementById('editTaskId').value);
-            const proj = appData.projects.find(p => p.id === projectId);
-            const task = proj.tasks.find(t => t.id === taskId);
-
-            task.name = document.getElementById('editTaskName').value;
-            task.dueDate = document.getElementById('editTaskDueDate').value || null;
-            task.recurrence = document.getElementById('editTaskRecurrence').value;
-
-            saveData();
-            closeEditModal();
-            renderProjects();
-        }
-
-        // --- ANALYTICS & COMPPARATIVO SEMANAL ---
-        function renderAnalytics() {
-            // Cálculo simulado/real robusto para taxa de hábitos e semana anterior
-            const today = new Date();
-            const formatDate = (d) => d.toISOString().split('T')[0];
-
-            let currWeekSuccess = 0, currWeekTotal = 0;
-            let prevWeekSuccess = 0, prevWeekTotal = 0;
-
-            appData.habits.forEach(h => {
-                if (!h.logs) return;
-                for (let i = 0; i < 7; i++) {
-                    const d = new Date();
-                    d.setDate(today.getDate() - i);
-                    const dateStr = formatDate(d);
-                    currWeekTotal++;
-                    if (h.logs[dateStr]) currWeekSuccess++;
-                }
-                for (let i = 7; i < 14; i++) {
-                    const d = new Date();
-                    d.setDate(today.getDate() - i);
-                    const dateStr = formatDate(d);
-                    prevWeekTotal++;
-                    if (h.logs[dateStr]) prevWeekSuccess++;
-                }
-            });
-
-            const currRate = currWeekTotal > 0 ? (currWeekSuccess / currWeekTotal) * 100 : 0;
-            const prevRate = prevWeekTotal > 0 ? (prevWeekSuccess / prevWeekTotal) * 100 : 0;
-            const diff = currRate - prevRate;
-
-            document.getElementById('habitRateValue').textContent = currRate.toFixed(1) + '%';
-            
-            const compEl = document.getElementById('habitRateComparison');
-            const diffFormatted = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%';
-            if (diff >= 0) {
-                compEl.innerHTML = `<span class="text-success">${diffFormatted} em relação à semana anterior</span>`;
-            } else {
-                compEl.innerHTML = `<span class="text-danger">${diffFormatted} em relação à semana anterior</span>`;
-            }
-        }
-
-        // --- OUTRAS ABAS ---
-        function renderFinances() {
-            document.getElementById('financesContainer').innerHTML = `<p>${appData.finances.length} registros financeiros carregados com sucesso.</p>`;
-        }
-        function renderGoals() {
-            document.getElementById('goalsContainer').innerHTML = `<p>${appData.goals.length} metas cadastradas.</p>`;
-        }
-        function renderCalendar() {
-            document.getElementById('calendarContainer').innerHTML = `<p>${appData.events.length} eventos no calendário.</p>`;
-        }
-
-        // Inicializa na aba de projetos ou hábitos
-        window.onload = () => {
-            switchTab('projects');
-        };
-    </script>
+      };
+      reader.readAsText(file);
+    }
+  </script>
 </body>
 </html>
