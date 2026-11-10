@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Life OS - Dashboard Pessoal</title>
+  <title>Meu Dashboard Pessoal</title>
 
   <!-- PWA & Mobile Optimization Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -288,7 +288,7 @@
       </div>
     </section>
 
-    <!-- PILAR 2: PROJETOS & TAREFAS (Com Progresso e Estatísticas de Conclusão) -->
+    <!-- PILAR 2: PROJETOS & TAREFAS -->
     <section id="pillar-projects" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -325,7 +325,7 @@
       </div>
     </section>
 
-    <!-- PILAR 3: FINANÇAS (Com PIX, Renda Fixa/Variável e Observação) -->
+    <!-- PILAR 3: FINANÇAS -->
     <section id="pillar-finances" class="pillar-content hidden space-y-6">
       <div class="pastel-card rounded-2xl p-6">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -414,6 +414,51 @@
           </div>
         </div>
 
+        <!-- GRÁFICOS DE DESEMPENHO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- Gráfico Hábitos -->
+          <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Consistência dos Hábitos</h3>
+              <div class="flex items-center gap-1 text-[10px] bg-white p-1 rounded-lg border border-slate-200">
+                <button id="btnHabitsWeekly" onclick="setAnalyticsHabitsTimeframe('weekly')" class="px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold">Semanal</button>
+                <button id="btnHabitsMonthly" onclick="setAnalyticsHabitsTimeframe('monthly')" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal</button>
+              </div>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="habitsAnalyticsChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Gráfico Tarefas -->
+          <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Status das Tarefas</h3>
+              <div class="flex items-center gap-1 text-[10px] bg-white p-1 rounded-lg border border-slate-200">
+                <button id="btnTasksWeekly" onclick="setAnalyticsTasksTimeframe('weekly')" class="px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold">Semanal</button>
+                <button id="btnTasksMonthly" onclick="setAnalyticsTasksTimeframe('monthly')" class="px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100">Mensal</button>
+              </div>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="tasksAnalyticsChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico Finanças Anual -->
+        <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Evolução Financeira Anual</h3>
+            <span id="analyticsFinanceMonthBadge" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">Ano: 2026</span>
+          </div>
+          <div class="h-64 relative">
+            <canvas id="financeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <!-- MODAL: EDITAR TAREFA -->
   <div id="editTaskModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
@@ -453,6 +498,97 @@
       <div class="mt-6 flex justify-end gap-2">
         <button onclick="closeEditTaskModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
         <button onclick="saveEditedTask()" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR HÁBITO -->
+  <div id="editHabitModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-base text-slate-800">Editar Hábito</h3>
+        <button onclick="closeEditHabitModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="editHabitId">
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Nome do Hábito</label>
+          <input type="text" id="editHabitName" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-300">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Meta Semanal (dias)</label>
+          <select id="editHabitTarget" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-300">
+            <option value="7">7 dias/sem</option>
+            <option value="6">6 dias/sem</option>
+            <option value="5">5 dias/sem</option>
+            <option value="4">4 dias/sem</option>
+            <option value="3">3 dias/sem</option>
+            <option value="2">2 dias/sem</option>
+            <option value="1">1 dia/sem</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeEditHabitModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
+        <button onclick="saveEditedHabit()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA FINANÇA -->
+  <div id="financeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-base text-slate-800">Novo Lançamento Financeiro</h3>
+        <button onclick="closeFinanceModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Descrição</label>
+          <input type="text" id="finTitle" placeholder="Ex: Salário, Mercado, Dividendos..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="finAmount" placeholder="0,00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Tipo</label>
+            <select id="finType" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+              <option value="income">Entrada / Receita</option>
+              <option value="expense">Saída / Conta Fixa</option>
+              <option value="pix">PIX / Dinheiro</option>
+              <option value="card">Cartão de Crédito</option>
+              <option value="fixed_inv">Invest. Renda Fixa</option>
+              <option value="var_inv">Invest. Renda Variável</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-600 mb-1">Mês de Referência</label>
+            <input type="month" id="finMonthVal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Observações / Detalhes (Opcional)</label>
+          <textarea id="finNotes" rows="2" placeholder="Notas sobre a transação..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:outline-none focus:ring-2 focus:ring-sky-300"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="closeFinanceModal()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl font-medium text-xs transition">Cancelar</button>
+        <button onclick="saveFinanceEntry()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-semibold text-xs shadow-sm transition">Salvar Lançamento</button>
       </div>
     </div>
   </div>
@@ -572,12 +708,9 @@
       renderAll();
     }
 
-    // --- STREAMING_CHUNK:Implementing Habit Progress & Monday-based Week logic... ---
-    // CÁLCULO DE SEMANA COM INÍCIO NA SEGUNDA-FEIRA
     function getWeekDatesMondayStart(offset = 0) {
       const curr = new Date();
       const dayOfWeek = curr.getDay(); // 0 = Dom, 1 = Seg, ...
-      // Distância para a segunda-feira da semana atual
       const distanceToMon = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek) + (offset * 7);
       
       const dates = [];
@@ -626,7 +759,6 @@
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50/60 transition';
 
-        // Calcular progresso na semana ativa
         let completedCount = 0;
         dates.forEach(d => {
           if (habit.logs && habit.logs[d]) completedCount++;
@@ -650,7 +782,6 @@
         tr.innerHTML = `
           <td class="py-3 px-2 font-medium text-slate-700">${habit.name}</td>
           
-          <!-- PROGRESSO E META SEMANAL -->
           <td class="py-3 px-2">
             <div class="space-y-1">
               <div class="flex items-center justify-between text-[11px] font-semibold">
@@ -681,7 +812,31 @@
       lucide.createIcons();
     }
 
-    // --- STREAMING_CHUNK:Implementing Habit Editing Modal Logic... ---
+    function toggleHabitLog(habitId, dateStr) {
+      const habit = appState.habits.find(h => h.id === habitId);
+      if (habit) {
+        if (!habit.logs) habit.logs = {};
+        habit.logs[dateStr] = !habit.logs[dateStr];
+        saveData();
+      }
+    }
+
+    function addHabit() {
+      const input = document.getElementById('newHabitInput');
+      const targetSelect = document.getElementById('newHabitTarget');
+      if (!input.value.trim()) return;
+
+      appState.habits.push({
+        id: Date.now(),
+        name: input.value.trim(),
+        targetDays: parseInt(targetSelect.value, 10),
+        logs: {}
+      });
+
+      input.value = '';
+      saveData();
+    }
+
     function openEditHabitModal(id) {
       const habit = appState.habits.find(h => h.id === id);
       if (!habit) return;
@@ -711,7 +866,6 @@
       closeEditHabitModal();
     }
 
-    // --- STREAMING_CHUNK:Implementing Annual Goals Pillar Logic... ---
     function renderGoals() {
       const listContainer = document.getElementById('goalsList');
       if (!listContainer) return;
@@ -789,8 +943,25 @@
       saveData();
     }
 
-    // --- STREAMING_CHUNK:Implementing Project Tasks & Progress calculation... ---
-    // PROJETOS, TAREFAS E CONTADORES
+    function addProject() {
+      const input = document.getElementById('newProjectInput');
+      if (!input.value.trim()) return;
+
+      appState.projects.push({
+        id: Date.now(),
+        name: input.value.trim(),
+        tasks: []
+      });
+
+      input.value = '';
+      saveData();
+    }
+
+    function deleteProject(pId) {
+      appState.projects = appState.projects.filter(p => p.id !== pId);
+      saveData();
+    }
+
     function renderProjects() {
       const container = document.getElementById('projectsContainer');
       container.innerHTML = '';
@@ -1011,7 +1182,6 @@
           const wasDone = task.done;
           task.done = !wasDone;
 
-          // Se a tarefa acabou de ser concluída e tem recorrência, gera a próxima ocorrência
           if (!wasDone && task.recurrence && task.recurrence !== 'none') {
             const nextDueDate = calculateNextRecurrenceDate(task.dueDate, task.recurrence);
             project.tasks.push({
@@ -1110,7 +1280,6 @@
       document.getElementById('pomodoroBanner').classList.add('hidden');
     }
 
-    // --- STREAMING_CHUNK:Implementing Extended Finances & Investment Logic... ---
     // MÓDULO DE FINANÇAS EXPANDIDO
     function renderFinances() {
       document.getElementById('financeMonthLabel').textContent = `Mês selecionado: ${selectedMonth}`;
@@ -1129,7 +1298,6 @@
         if (f.type === 'fixed_inv') fixedInv += val;
         if (f.type === 'var_inv') varInv += val;
 
-        // Definir badges e estilos para as diferentes categorias
         let typeBadgeHtml = '';
         if (f.type === 'income') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">Entrada</span>`;
         else if (f.type === 'expense') typeBadgeHtml = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800">Saída</span>`;
@@ -1213,7 +1381,6 @@
 
     // ANALYTICS DE DESEMPENHO
     function renderAnalytics() {
-      // Cálculo da taxa da semana atual vs. semana anterior
       const currentWeekDates = getWeekDatesMondayStart(currentWeekOffset);
       const prevWeekDates = getWeekDatesMondayStart(currentWeekOffset - 1);
 
@@ -1273,10 +1440,10 @@
       const btnW = document.getElementById('btnHabitsWeekly');
       const btnM = document.getElementById('btnHabitsMonthly');
       if (tf === 'weekly') {
-        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm';
+        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
         btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       } else {
-        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm';
+        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-emerald-500 text-white shadow-sm font-semibold';
         btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       }
       renderHabitsAnalyticsChart();
@@ -1287,10 +1454,10 @@
       const btnW = document.getElementById('btnTasksWeekly');
       const btnM = document.getElementById('btnTasksMonthly');
       if (tf === 'weekly') {
-        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm';
+        btnW.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
         btnM.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       } else {
-        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm';
+        btnM.className = 'px-2.5 py-1 rounded-lg transition bg-indigo-500 text-white shadow-sm font-semibold';
         btnW.className = 'px-2.5 py-1 rounded-lg transition text-slate-500 hover:bg-slate-100';
       }
       renderTasksAnalyticsChart();
@@ -1316,9 +1483,8 @@
           actualData.push(count);
         });
       } else {
-        // Mensal: calcula com base no mês selecionado
         appState.habits.forEach(h => {
-          const targetMonthly = (h.targetDays || 5) * 4; // Aproximação de 4 semanas
+          const targetMonthly = (h.targetDays || 5) * 4;
           targetData.push(targetMonthly);
           let count = 0;
           if (h.logs) {
@@ -1393,7 +1559,6 @@
           });
         });
       } else {
-        // Mensal
         appState.projects.forEach(p => {
           p.tasks.forEach(t => {
             if (t.dueDate && t.dueDate.startsWith(selectedMonth)) {
@@ -1441,7 +1606,6 @@
       const monthlyExpenses = new Array(12).fill(0);
       const monthlyInvestments = new Array(12).fill(0);
 
-      // Agrupa os registros financeiros pelos 12 meses do ano ativo
       appState.finances.forEach(f => {
         if (f.month && f.month.startsWith(currentYear)) {
           const mIdx = parseInt(f.month.slice(5, 7), 10) - 1;
